@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ProfileDTO.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">naukri</a> &gt; <a href="index.source.html" class="el_package">com.dto</a> &gt; <span class="el_source">ProfileDTO.java</span></div><h1>ProfileDTO.java</h1><pre class="source lang-java linenums">package com.dto;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+
+import com.model.Project;
+import com.model.Skill;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Getter
+<span class="fc" id="L19">@Setter</span>
+<span class="fc" id="L20">@NoArgsConstructor</span>
+public class ProfileDTO {
+    @NotNull
+<span class="fc" id="L23">    private String candidateName;</span>
+    @Min(value = 20)
+<span class="fc" id="L25">    private int age;</span>
+    
+<span class="fc" id="L27">    private int experience;</span>
+    
+<span class="fc" id="L29">    private String location;</span>
+    
+<span class="fc" id="L31">    private String educationQualification;</span>
+    
+    @NotNull
+<span class="fc" id="L34">    private String emailId;</span>
+    
+    @NotNull
+<span class="fc" id="L37">    private String password;</span>
+    
+<span class="fc" id="L39">    private List&lt;ProjectDTO&gt; projectDTOList = new ArrayList&lt;&gt;();</span>
+    
+<span class="fc" id="L41">    private Set&lt;SkillDTO&gt; skillDTOSet = new HashSet&lt;&gt;();</span>
+
+    public ProfileDTO(@NotNull String candidateName, @Min(20) int age, int experience, String location,
+            String educationQualification, String emailId, String password, List&lt;ProjectDTO&gt; projectDTOList,
+            Set&lt;SkillDTO&gt; skillDTOSet) {
+<span class="fc" id="L46">        super();</span>
+<span class="fc" id="L47">        this.candidateName = candidateName;</span>
+<span class="fc" id="L48">        this.age = age;</span>
+<span class="fc" id="L49">        this.experience = experience;</span>
+<span class="fc" id="L50">        this.location = location;</span>
+<span class="fc" id="L51">        this.educationQualification = educationQualification;</span>
+<span class="fc" id="L52">        this.emailId = emailId;</span>
+<span class="fc" id="L53">        this.password = password;</span>
+<span class="fc" id="L54">        this.projectDTOList = projectDTOList;</span>
+<span class="fc" id="L55">        this.skillDTOSet = skillDTOSet;</span>
+<span class="fc" id="L56">    }</span>
+
+    
+    
+    
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

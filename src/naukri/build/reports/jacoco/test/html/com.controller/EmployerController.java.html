@@ -1,0 +1,376 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EmployerController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">naukri</a> &gt; <a href="index.source.html" class="el_package">com.controller</a> &gt; <span class="el_source">EmployerController.java</span></div><h1>EmployerController.java</h1><pre class="source lang-java linenums">package com.controller;
+
+import java.util.List;
+
+import java.util.ArrayList;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.dao.EmployerDAO;
+import com.dao.InterviewDAO;
+import com.dao.JobDAO;
+import com.dto.CandidateDTO;
+import com.dto.EmployerDTO;
+import com.dto.RatingFeedbackDTO;
+
+
+
+import com.enums.PostInterviewStatus;
+import com.enums.PreInterviewStatus;
+import com.exception.AllInterviewsNotCompletedException;
+import com.exception.CandidateNotFoundException;
+import com.exception.JobAlreadyClosedWithCandidateSelectedException;
+import com.exception.NoEmployersException;
+import com.exception.NoSuchEmployerFoundException;
+import com.exception.NoSuchInterviewFoundException;
+import com.exception.NoSuchJobFoundException;
+import com.exception.feedbackException;
+import com.helper.DecryptUserDetails;
+import com.exception.NotShortlistedException;
+import com.model.Candidate;
+import com.model.Employer;
+import com.model.Interview;
+import com.model.Job;
+import com.model.Skill;
+import com.service.CandidateService;
+import com.service.EmployerService;
+import com.service.InterviewService;
+import com.service.JobService;
+
+import io.swagger.annotations.ApiOperation;
+
+@RestController
+<span class="fc" id="L56">public class EmployerController {</span>
+
+    @Autowired
+    EmployerService employerService;
+    
+    @Autowired
+    JobService jobService;
+    
+    @Autowired
+    InterviewService interviewService;
+  
+	@Autowired
+	EmployerDAO employerDAO;
+
+	@Autowired
+	JobDAO jobDAO;
+
+	@Autowired
+	InterviewDAO interviewDAO;
+	
+	@Autowired
+	CandidateService candidateService;
+	
+	@Autowired
+	DecryptUserDetails descryptUser;
+
+	@ApiOperation(value = &quot;add an employer&quot;, notes = &quot;Adding a new employer&quot;, nickname = &quot;add-employer&quot;)
+	@PostMapping(&quot;/addEmployer&quot;)
+	public ResponseEntity&lt;String&gt; addEmployer(@RequestBody EmployerDTO employerDTO) {
+		
+<span class="fc" id="L86">	    employerService.addEmployer(employerDTO);</span>
+<span class="fc" id="L87">		return new ResponseEntity&lt;&gt;(&quot;Employer added successfully&quot;, HttpStatus.ACCEPTED);</span>
+	
+	}
+	
+	@ApiOperation(value = &quot;get all empolyees&quot;, notes = &quot;get all empolyees&quot;, nickname = &quot;get all empolyees&quot;)
+	@GetMapping(&quot;/getAllEmployers&quot;)
+	public ResponseEntity&lt;?&gt; getAllEmployers() {
+	  try {
+<span class="fc" id="L95">	    return new ResponseEntity&lt;&gt;(employerService.findAllEmployers(), HttpStatus.OK);	    </span>
+<span class="nc" id="L96">	  } catch (NoEmployersException e) {</span>
+<span class="nc" id="L97">	    return new ResponseEntity&lt;&gt;(e.getMessage(), HttpStatus.NOT_FOUND);</span>
+	  }
+	}
+	
+	@ApiOperation(value = &quot;get empolyees&quot;, notes = &quot;get empolyee  details&quot;, nickname = &quot;get empolye detailss&quot;)
+	@GetMapping(&quot;/getEmployeDetails&quot;)
+	public ResponseEntity&lt;?&gt; getEmployer(HttpServletRequest request) throws NoSuchEmployerFoundException {
+<span class="nc" id="L104">	  String emailId = descryptUser.decryptEmailId(request);</span>
+	  
+<span class="nc" id="L106">	  Employer employee = employerService.getEmployerByEmailId(emailId);</span>
+	   
+<span class="nc" id="L108">	return new ResponseEntity&lt;&gt;(employee, HttpStatus.OK);</span>
+	}
+	
+	
+	@ApiOperation(value = &quot;get all candidates by experience&quot;, notes = &quot;Employer get all candidates by experience&quot;, nickname = &quot;get all empolyees&quot;)
+	@GetMapping(&quot;/getAllCandidatesByExperience/{experience_lb}/{experience_ub}&quot;)
+    public ResponseEntity&lt;List&lt;CandidateDTO&gt;&gt; getAllCandidatesByExperience(@PathVariable Integer experience_lb, @PathVariable Integer experience_ub){
+<span class="nc" id="L115">    	return new ResponseEntity&lt;&gt;(candidateService.getAllCandidatesByExperience(experience_lb, experience_ub),HttpStatus.OK);</span>
+	}
+    
+
+
+
+	@ApiOperation(value = &quot;Close Job&quot;,notes=&quot;Employer Id fetched from token&quot;,nickname = &quot;Close Job and select the candidate&quot;)
+	@GetMapping(&quot;/closeJob&quot;)
+	public ResponseEntity&lt;?&gt; selectCandidateAndCloseJob(HttpServletRequest request,
+	  @RequestParam(&quot;candidateId&quot;) String selectedCandidateId,
+	  @RequestParam(&quot;jobId&quot;) String jobId
+	) throws NumberFormatException, CandidateNotFoundException {
+	  try {
+		  
+<span class="nc" id="L129">		 String employerEmailId = descryptUser.decryptEmailId(request);</span>
+<span class="nc" id="L130">		 int employerId = employerService.getEmployerByEmailId(employerEmailId).getEmployerId();</span>
+  	    // employer will execute this method, so employerId is available
+  	    // the job for which a candidate is selected should be provided
+		  
+<span class="nc" id="L134">  	    Employer employer = employerService.getEmployerById(employerId);</span>
+  	    
+  	    // the job corresponding to the interview
+<span class="nc" id="L137">  	    Job job = jobService.getJobById(Integer.parseInt(jobId));</span>
+  	    
+  	    // the candidate who is selected should be provided
+<span class="nc" id="L140">  	    Candidate candidate = candidateService.getCandidateById(Integer.parseInt(selectedCandidateId));</span>
+  
+  	    // find the interview conducted for THIS particular candidate for THIS particular job and employer
+<span class="nc" id="L143">  	    Interview interview = interviewDAO.findByCandidateAndEmployerAndJob(candidate, employer, job);</span>
+
+	    // select the candidate
+<span class="nc" id="L146">	    employerService.selectCandidateForJobAfterInterview(interview);</span>
+	    
+	    // close the job
+<span class="nc" id="L149">	    jobService.closeJob(job);</span>
+
+<span class="nc" id="L151">	    return new ResponseEntity&lt;&gt;(&quot;Candidate selected successfully&quot;, HttpStatus.OK);</span>
+<span class="nc" id="L152">	  } catch (NoSuchEmployerFoundException exception) {</span>
+<span class="nc" id="L153">        return new ResponseEntity&lt;&gt;(exception.getMessage(), HttpStatus.NOT_FOUND);</span>
+<span class="nc" id="L154">      } catch (NoSuchJobFoundException exception) {</span>
+<span class="nc" id="L155">        return new ResponseEntity&lt;&gt;(exception.getMessage(), HttpStatus.NOT_FOUND);</span>
+<span class="nc" id="L156">      } catch (AllInterviewsNotCompletedException exception) {</span>
+<span class="nc" id="L157">	    return new ResponseEntity&lt;&gt;(exception.getMessage(), HttpStatus.OK);</span>
+<span class="nc" id="L158">	  } catch (JobAlreadyClosedWithCandidateSelectedException exception) {</span>
+<span class="nc" id="L159">        return new ResponseEntity&lt;&gt;(exception.getMessage(), HttpStatus.OK);</span>
+      }
+	}
+
+
+	
+	@ApiOperation(value = &quot;feedBack&quot;, notes = &quot;Employer feedBack&quot;, nickname = &quot;employer feedback&quot;)
+	@PostMapping(&quot;/feedbackRating/{interviewId}&quot;)
+	public ResponseEntity&lt;String&gt; feedbackRating(@PathVariable(&quot;interviewId&quot;) String id, @RequestBody RatingFeedbackDTO dto) throws feedbackException {
+	  try {
+<span class="nc" id="L169">	    Interview i = interviewService.getInterviewById(Integer.parseInt(id));</span>
+<span class="nc" id="L170">	      interviewService.provideEmployerFeedback(i, dto);</span>
+<span class="nc" id="L171">	      return new ResponseEntity&lt;&gt;(&quot;Feedback and rating by employer saved&quot;, HttpStatus.OK);</span>
+<span class="nc" id="L172">	  } catch (NoSuchInterviewFoundException e) {</span>
+<span class="nc" id="L173">	    return new ResponseEntity&lt;&gt;(e.getMessage(), HttpStatus.NOT_FOUND);</span>
+	  }
+	}
+	
+	
+	//Pawanesh
+	@ApiOperation(value = &quot;shortlistCandidate&quot;, notes = &quot;Employer shortlists the candidate&quot;, nickname = &quot;get all empolyees&quot;)
+	@PatchMapping(&quot;/shortlistCandidate/{candidateId}/{employerId}/{jobId}&quot;)
+	public ResponseEntity&lt;String&gt; updateShortlistedInterview(@PathVariable String candidateId, @PathVariable String employerId,@PathVariable String jobId) throws NumberFormatException, NoSuchJobFoundException, NoSuchEmployerFoundException, CandidateNotFoundException
+	{
+		
+<span class="nc" id="L184">		Candidate candidate = candidateService.getCandidateById(Integer.parseInt(candidateId));</span>
+<span class="nc" id="L185">		Job job = jobService.getJobById(Integer.parseInt(jobId));</span>
+<span class="nc" id="L186">		Employer employer = employerService.getEmployerById(Integer.parseInt(employerId));</span>
+		
+<span class="nc" id="L188">		Interview interview = interviewDAO.findByCandidateAndEmployerAndJob(candidate, employer, job);</span>
+		
+<span class="nc" id="L190">		interview.setPreInterviewStatus(PreInterviewStatus.SHORTLISTED);</span>
+		
+<span class="nc" id="L192">		interviewDAO.save(interview);</span>
+		
+<span class="nc" id="L194">		return new ResponseEntity&lt;&gt;(&quot;Successfully Updated Shortlisted candidate&quot;, HttpStatus.OK);</span>
+		
+		
+	}
+	
+	@ApiOperation(value = &quot;Shorlisted Candidates&quot;, notes = &quot;for sending notification Shorlisted Candidates&quot;, nickname = &quot;Shorlisted Candidates&quot;)
+	@GetMapping(&quot;getAllShortListedCandidate/{jobId}&quot;)
+	public ResponseEntity&lt;List&gt; notificationforShortlisted(@PathVariable String jobId) throws NumberFormatException, NoSuchJobFoundException 
+	{
+<span class="nc" id="L203">		Job job = jobService.findJobById(Integer.parseInt(jobId));</span>
+<span class="nc" id="L204">		List&lt;Interview&gt; interviews = interviewService.getAllShorttlistedCandidate(PreInterviewStatus.SHORTLISTED, job);</span>
+		
+<span class="nc" id="L206">		List&lt;Candidate&gt; shortListCandidate = new ArrayList();</span>
+<span class="nc bnc" id="L207" title="All 2 branches missed.">		for(Interview interview : interviews) {</span>
+<span class="nc" id="L208">			shortListCandidate.add(interview.getCandidate());</span>
+<span class="nc" id="L209">		}</span>
+		
+<span class="nc" id="L211">		return new ResponseEntity&lt;&gt; (shortListCandidate, HttpStatus.OK);</span>
+		
+	}
+	
+	
+	@ApiOperation(value = &quot;updating candidates status to waiitng&quot;, notes = &quot;updating candidates status to waiitng&quot;, nickname = &quot;updating candidates status to waiitng&quot;)
+	@PatchMapping(&quot;/waitingCandidate/{candidateId}/{employerId}/{jobId}&quot;)
+	public ResponseEntity&lt;String&gt; updateSelectedInterview(HttpServletRequest request, @PathVariable String candidateId, @PathVariable String jobId)
+			throws NumberFormatException, NoSuchJobFoundException, NoSuchEmployerFoundException, NotShortlistedException, CandidateNotFoundException
+
+	{
+		
+<span class="nc" id="L223">		String employerEmailId = descryptUser.decryptEmailId(request);</span>
+<span class="nc" id="L224">		int employerId = employerService.getEmployerByEmailId(employerEmailId).getEmployerId();</span>
+		
+<span class="nc" id="L226">		Candidate candidate = candidateService.getCandidateById(Integer.parseInt(candidateId));</span>
+		
+<span class="nc" id="L228">		Job job = jobService.getJobById(Integer.parseInt(jobId));</span>
+<span class="nc" id="L229">		Employer employer= employerService.getEmployerById(employerId);</span>
+		
+<span class="nc" id="L231">		Interview interview = interviewDAO.findByCandidateAndEmployerAndJob(candidate, employer, job);</span>
+		
+<span class="nc bnc" id="L233" title="All 2 branches missed.">		if(interview.getPreInterviewStatus() == PreInterviewStatus.APPLIED) {</span>
+			
+<span class="nc" id="L235">			throw new NotShortlistedException(candidate.getCandidateId());</span>
+		
+		}
+<span class="nc bnc" id="L238" title="All 2 branches missed.">		if(interview.getPreInterviewStatus() == PreInterviewStatus.NOT_SHORTLISTED) {</span>
+<span class="nc" id="L239">			throw new NotShortlistedException(&quot;Candidate is not Shortlisted for this Job &quot;);</span>
+		}
+		
+<span class="nc" id="L242">		interview.setPostInterviewStatus(PostInterviewStatus.WAITING);</span>
+		
+<span class="nc" id="L244">		interviewDAO.save(interview);</span>
+		
+<span class="nc" id="L246">		return new ResponseEntity&lt;&gt; (&quot;Successfully Updated Waiting candidate&quot;,HttpStatus.OK);</span>
+		
+	}
+	
+	@ApiOperation(value = &quot;Rejecting Candidates&quot;, notes = &quot;Employer Rejecting Candidates&quot;, nickname = &quot;RC&quot;)
+	@PatchMapping(&quot;/rejectedCandidate/{candidateId}/{employerId}/{jobId}&quot;)
+	public ResponseEntity&lt;String&gt; updateSelectedInterview1(@PathVariable String candidateId, @PathVariable String employerId, @PathVariable String jobId) throws NumberFormatException, NoSuchJobFoundException, NoSuchEmployerFoundException, CandidateNotFoundException
+	{
+<span class="nc" id="L254">		Candidate candidate = candidateService.getCandidateById(Integer.parseInt(candidateId));</span>
+<span class="nc" id="L255">		Job job = jobService.getJobById(Integer.parseInt(jobId));</span>
+<span class="nc" id="L256">		Employer employer= employerService.getEmployerById(Integer.parseInt(employerId));</span>
+		
+<span class="nc" id="L258">		Interview interview = interviewDAO.findByCandidateAndEmployerAndJob(candidate, employer, job);</span>
+		
+		
+<span class="nc bnc" id="L261" title="All 2 branches missed.">		if(interview.getPreInterviewStatus().equals(PreInterviewStatus.APPLIED)) {</span>
+			
+<span class="nc" id="L263">			interview.setPreInterviewStatus(PreInterviewStatus.NOT_SHORTLISTED);</span>
+		
+		}
+<span class="nc" id="L266">		interview.setPostInterviewStatus(PostInterviewStatus.REJECTED);</span>
+		
+<span class="nc" id="L268">		interviewDAO.save(interview);</span>
+		
+<span class="nc" id="L270">		return new ResponseEntity&lt;&gt; (&quot;Successfully Updated Rejected candidate&quot;,HttpStatus.OK);</span>
+		
+	}
+	
+//	@GetMapping(&quot;getAllNotShortListedCandidate/{jobId}&quot;)
+//	public ResponseEntity&lt;List&gt; notificationforNotShortListed(@PathVariable String jobId) throws NumberFormatException, NoSuchJobFoundException
+//	{
+//		Job job =jobService.findJobById(Integer.parseInt(jobId));
+//		List&lt;Interview&gt; interviews = interviewService.getAllNotShortListedCandidate(PreInterviewStatus.NOT_SHORTLISTED,job);
+//		
+//		List&lt;Candidate&gt; notShortListed = new ArrayList();
+//		for(Interview interview : interviews)
+//		{
+//			notShortListed.add(interview.getCandidate());
+//		}
+//		
+//		return new ResponseEntity&lt;&gt; (notShortListed, HttpStatus.OK);
+//	}
+	
+	//Pawanesh
+	
+	
+	// the method for conducting interview should handle exceptions such that
+	// if the candidate has not been short-listed, and even then if the employer
+	// tries to conduct an interview with that candidate, it should throw error
+	
+	
+	// before conducting even one interview for a particular job, there has to be
+	// a check for the list of candidates who applied for that job. if even one
+	// of them has pre-interview status as 'invalid', it means that the employer
+	// has not yet decided whether to short-list him/her or not. In such case,
+	// commencing interviews is not allowed and doing so should throw error
+	
+	
+	// for both an employer and a candidate, participating in an interview
+	// should happen only if they have provided rating and feedback to all
+	// their previous interviews. If even one interview corresponding to
+	// the employer or candidate is missing their rating or feedback,
+	// conducting a new interview should throw error
+	
+	@ApiOperation(value = &quot;Closing job&quot;, notes = &quot;Employer closes job without selecting anyone&quot;, nickname = &quot;RC&quot;)
+	@GetMapping(&quot;/closeJobPostingForcefully&quot;)
+	public ResponseEntity&lt;?&gt; closeJobPosting(@RequestParam(&quot;jobId&quot;) String jobId) {
+	  // employer doesn't wish to interview candidates any longer, nor does he/she wish to hire anyone
+	  // so the job should be closed without selecting any candidates, and they all are rejected
+	  
+	  try {
+	    // find the job object
+<span class="nc" id="L318">	    Job job = jobService.getJobById(Integer.parseInt(jobId));</span>
+	    
+	    // close the job
+<span class="nc" id="L321">	    jobService.closeJob(job);</span>
+	    
+	    // reject all the candidates for this job
+<span class="nc" id="L324">	    interviewService.rejectAllInterviewsForJob(job);</span>
+	    
+<span class="nc" id="L326">	    return new ResponseEntity&lt;&gt;(&quot;Job posting forcefully closed&quot;, HttpStatus.OK);</span>
+	    
+<span class="nc" id="L328">	  } catch (NoSuchJobFoundException e) {</span>
+<span class="nc" id="L329">	    return new ResponseEntity&lt;&gt;(e.getMessage(), HttpStatus.NOT_FOUND);</span>
+	  }
+	}
+	
+	
+	@ApiOperation(value = &quot;getCandidateApplicationStatus&quot;, notes = &quot;Employer getCandidateApplicationStatus&quot;, nickname = &quot;RC&quot;)
+	@GetMapping(&quot;/getCandidateApplicationStatus/{id}&quot;)
+    public List&lt;Interview&gt; getCandidateInterviews(@PathVariable  int id) throws CandidateNotFoundException {
+<span class="nc" id="L337">        Candidate candidate = candidateService.getCandidateById(id);</span>
+<span class="nc bnc" id="L338" title="All 2 branches missed.">        if (candidate==null) {</span>
+<span class="nc" id="L339">            throw new CandidateNotFoundException(&quot;id: &quot;+id +&quot;not found&quot;);</span>
+        }
+<span class="nc" id="L341">        List&lt;Interview&gt; interviewStatus = candidate.getInterviewList();</span>
+<span class="nc" id="L342">        return  interviewStatus;</span>
+    }
+    
+	
+	@ApiOperation(value = &quot;getAllCandidatesByQualification&quot;, notes = &quot;Employer gets All Candidates By Qualification&quot;, nickname = &quot;RC&quot;)
+    @GetMapping(&quot;/getAllCandidatesByQualification/{qualification}&quot;)
+    public ResponseEntity&lt;List&lt;CandidateDTO&gt;&gt; getAllCandidatesByQualification(@PathVariable String qualification){
+<span class="nc" id="L349">        return new ResponseEntity&lt;&gt;(candidateService.getAllCandidatesByQualification(qualification),HttpStatus.OK);</span>
+    }
+    
+	@ApiOperation(value = &quot;getAllCandidatesBySkillSet&quot;, notes = &quot;Employer getAllCandidatesBySkillSet&quot;, nickname = &quot;RC&quot;)
+    @PostMapping(&quot;/getAllCandidatesBySkillSet&quot;)
+    public ResponseEntity&lt;List&lt;CandidateDTO&gt;&gt; getAllCandidatesBySkillSet(@RequestBody String skills){
+<span class="nc" id="L355">        return new ResponseEntity&lt;&gt;(candidateService.getAllCandidatesBySkillSet(skills), HttpStatus.OK);</span>
+    }
+  
+    
+	@ApiOperation(value = &quot;getAllCandidatesByJobId&quot;, notes = &quot;Employer gets All Candidates By SkillSet&quot;, nickname = &quot;RC&quot;)
+    @GetMapping(&quot;/getAllCandidatesByJobId/{jobId}&quot;)
+    public ResponseEntity&lt;Set&lt;CandidateDTO&gt;&gt; getAllCandidatesByJobId(@PathVariable Integer jobId) throws NoSuchJobFoundException{
+<span class="nc" id="L362">        Job job= null;</span>
+        try {
+<span class="nc" id="L364">            job = jobService.findJobById(jobId);</span>
+<span class="nc" id="L365">            return new ResponseEntity&lt;&gt;(candidateService.candidateSetToDTO(job.getCandidateSet()), HttpStatus.OK);</span>
+<span class="nc" id="L366">        } catch (NoSuchJobFoundException e) {</span>
+<span class="nc" id="L367">            throw e;</span>
+        }
+    }
+	
+	
+	
+	
+		
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,84 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Job.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">naukri</a> &gt; <a href="index.source.html" class="el_package">com.model</a> &gt; <span class="el_source">Job.java</span></div><h1>Job.java</h1><pre class="source lang-java linenums">package com.model;
+
+
+import java.util.*;
+
+import javax.persistence.*;
+
+import com.enums.JobStatus;
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
+import lombok.*;
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.Id;
+import javax.persistence.ManyToOne;
+import javax.persistence.NamedQuery;
+import javax.persistence.OneToMany;
+import javax.validation.constraints.NotNull;
+
+
+@Entity
+@Table(name=&quot;job_table&quot;)
+@Getter
+<span class="pc" id="L28">@Setter</span>
+<span class="fc" id="L29">@NoArgsConstructor</span>
+
+public class Job {
+	@Id
+	@GeneratedValue(strategy=GenerationType.IDENTITY)
+<span class="fc" id="L34">	private int jobId;</span>
+	
+<span class="fc" id="L36">	@Enumerated(EnumType.STRING)</span>
+<span class="nc" id="L37">	private JobStatus jobStatus = JobStatus.OPENED;</span>
+	
+	
+	//@NotNull
+<span class="fc" id="L41">    private String jobDescription;</span>
+<span class="fc" id="L42">    private String industry;</span>
+    
+<span class="fc" id="L44">    private String location;</span>
+    
+    @NotNull
+<span class="fc" id="L47">    private float salaryPackage;</span>
+	
+	
+	
+<span class="fc" id="L51">	@ManyToMany(fetch = FetchType.LAZY,</span>
+		      cascade = {
+		          CascadeType.PERSIST,
+		          CascadeType.MERGE
+		      },
+		      mappedBy = &quot;jobSet&quot;)
+	@JsonIgnore
+<span class="nc" id="L58">	private Set&lt;Candidate&gt;  candidateSet = new HashSet&lt;&gt;();</span>
+	
+<span class="fc" id="L60">	@JsonManagedReference(value=&quot;job_interview&quot;)</span>
+	    @OneToMany(cascade = CascadeType.ALL,mappedBy = &quot;job&quot;)
+<span class="nc" id="L62">	private List&lt;Interview&gt; interviewList = new ArrayList&lt;&gt;();</span>
+	
+	@JsonBackReference(value=&quot;employer_job&quot;)
+	@ManyToOne
+<span class="nc" id="L66">    private Employer createdBy;</span>
+
+	public Job(String jobDescription, String industry, String location, @NotNull float salaryPackage) {
+<span class="fc" id="L69">		super();</span>
+<span class="fc" id="L70">		this.jobDescription = jobDescription;</span>
+<span class="fc" id="L71">		this.industry = industry;</span>
+<span class="fc" id="L72">		this.location = location;</span>
+<span class="fc" id="L73">		this.salaryPackage = salaryPackage;</span>
+<span class="fc" id="L74">	}</span>
+
+	@Override
+	public String toString() {
+<span class="fc" id="L78">		return &quot;Job [jobStatus=&quot; + jobStatus + &quot;, jobDescription=&quot; + jobDescription + &quot;, industry=&quot; + industry</span>
+				+ &quot;, location=&quot; + location + &quot;, salaryPackage=&quot; + salaryPackage + &quot;]&quot;;
+	}
+	
+	
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

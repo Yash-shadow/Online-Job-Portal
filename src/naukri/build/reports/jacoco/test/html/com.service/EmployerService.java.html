@@ -1,0 +1,100 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>EmployerService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">naukri</a> &gt; <a href="index.source.html" class="el_package">com.service</a> &gt; <span class="el_source">EmployerService.java</span></div><h1>EmployerService.java</h1><pre class="source lang-java linenums">package com.service;
+
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
+import java.util.List;
+import java.util.stream.Collectors;
+
+
+
+
+import com.dao.EmployerDAO;
+import com.dao.InterviewDAO;
+import com.dto.EmployerDTO;
+
+
+import com.enums.JobStatus;
+import com.enums.PostInterviewStatus;
+import com.enums.PreInterviewStatus;
+import com.exception.AllInterviewsNotCompletedException;
+import com.exception.JobAlreadyClosedWithCandidateSelectedException;
+import com.exception.NoEmployersException;
+import com.exception.NoSuchEmployerFoundException;
+import com.model.Employer;
+import com.model.Interview;
+import com.model.Job;
+
+@Service
+<span class="fc" id="L29">public class EmployerService {</span>
+
+  @Autowired
+  EmployerDAO employerDAO;
+  
+  @Autowired
+  InterviewDAO interviewDAO;
+  
+  public void addEmployer(EmployerDTO dto) {
+<span class="fc" id="L38">    Employer employer = new Employer();</span>
+<span class="fc" id="L39">    employer.setEmployerName(dto.getEmployerName());</span>
+<span class="fc" id="L40">    employer.setLocation(dto.getLocation());</span>
+<span class="fc" id="L41">    employer.setEmailId(dto.getEmailId());</span>
+<span class="fc" id="L42">    employer.setPassword(dto.getPassword());</span>
+<span class="fc" id="L43">    employerDAO.save(employer);</span>
+<span class="fc" id="L44">  }</span>
+  
+  public List&lt;Employer&gt; findAllEmployers() throws NoEmployersException {
+<span class="fc" id="L47">    List&lt;Employer&gt; employerList = employerDAO.findAll();</span>
+<span class="pc bpc" id="L48" title="1 of 2 branches missed.">    if (employerList.size() == 0) throw new NoEmployersException();</span>
+<span class="fc" id="L49">    return employerList;</span>
+  }
+  
+  public Employer getEmployerById(int id) throws NoSuchEmployerFoundException {
+    try {      
+<span class="nc" id="L54">      Employer employer = employerDAO.findById(id).get();</span>
+<span class="nc" id="L55">      return employer;</span>
+<span class="nc" id="L56">    } catch (Exception e) {</span>
+<span class="nc" id="L57">      throw new NoSuchEmployerFoundException(id);</span>
+    }
+  }
+  
+  public Employer getEmployerByEmailId(String emailId) throws NoSuchEmployerFoundException{
+	  try {
+<span class="fc" id="L63">		  Employer employer = employerDAO.findByEmailId(emailId);</span>
+<span class="fc" id="L64">		  return employer;</span>
+	  }
+<span class="nc" id="L66">	  catch(Exception e) {</span>
+<span class="nc" id="L67">		  throw new NoSuchEmployerFoundException(emailId);</span>
+	  }
+  }
+  
+  public void selectCandidateForJobAfterInterview(Interview interview) throws JobAlreadyClosedWithCandidateSelectedException, AllInterviewsNotCompletedException {
+<span class="nc" id="L72">    Job j = interview.getJob();</span>
+<span class="nc bnc" id="L73" title="All 2 branches missed.">    if (j.getJobStatus().equals(JobStatus.CLOSED)) {</span>
+<span class="nc" id="L74">      throw new JobAlreadyClosedWithCandidateSelectedException();</span>
+    }
+<span class="nc" id="L76">    List&lt;Interview&gt; pendingInterviewsForJob = interviewDAO.findByJobAndPreInterviewStatusAndPostInterviewStatus(j, PreInterviewStatus.SHORTLISTED, PostInterviewStatus.INVALID);</span>
+<span class="nc bnc" id="L77" title="All 2 branches missed.">    if (pendingInterviewsForJob.size() != 0) {</span>
+<span class="nc" id="L78">      List&lt;String&gt; candidateList = pendingInterviewsForJob.stream().map((i) -&gt; i.getCandidate().getCandidateName()).collect(Collectors.toList());</span>
+<span class="nc" id="L79">      throw new AllInterviewsNotCompletedException(j.getJobId(), candidateList);</span>
+    }
+
+    // set the interview status for this interview as 'selected'
+<span class="nc" id="L83">    interview.setPostInterviewStatus(PostInterviewStatus.SELECTED);</span>
+<span class="nc" id="L84">    interviewDAO.save(interview);</span>
+    
+    // set the interview status for the remaining interviews for this job as 'rejected'
+<span class="nc" id="L87">    List&lt;Interview&gt; waitingCandidatesAfterInterview = interviewDAO.findByJobAndPostInterviewStatus(j, PostInterviewStatus.WAITING);</span>
+<span class="nc bnc" id="L88" title="All 2 branches missed.">    for (Interview i: waitingCandidatesAfterInterview) {</span>
+<span class="nc" id="L89">      i.setPostInterviewStatus(PostInterviewStatus.REJECTED);</span>
+<span class="nc" id="L90">      interviewDAO.save(i);</span>
+<span class="nc" id="L91">    }      </span>
+<span class="nc" id="L92">  }</span>
+  
+  public String deleteAllEmployer() {
+<span class="fc" id="L95">	  employerDAO.deleteAll();</span>
+<span class="fc" id="L96">	  return &quot;Successfully deleted all the Employer&quot;;</span>
+  }
+
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

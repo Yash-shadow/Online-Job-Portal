@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SwaggerConfig.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">naukri</a> &gt; <a href="index.source.html" class="el_package">com.config</a> &gt; <span class="el_source">SwaggerConfig.java</span></div><h1>SwaggerConfig.java</h1><pre class="source lang-java linenums">package com.config;
+
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+
+import springfox.documentation.builders.PathSelectors;
+import springfox.documentation.builders.RequestHandlerSelectors;
+import springfox.documentation.service.ApiInfo;
+import springfox.documentation.service.ApiKey;
+import springfox.documentation.service.AuthorizationScope;
+import springfox.documentation.service.Contact;
+import springfox.documentation.service.SecurityReference;
+import springfox.documentation.spi.DocumentationType;
+import springfox.documentation.spi.service.contexts.SecurityContext;
+import springfox.documentation.spring.web.plugins.Docket;
+
+@Configuration
+<span class="fc" id="L22">public class SwaggerConfig {</span>
+
+	public static final String AUTHORIZATION_HEADER = &quot;Authorization&quot;;
+	
+	private ApiKey apiKeys() {
+<span class="fc" id="L27">		return new ApiKey(&quot;JWT&quot;, AUTHORIZATION_HEADER, &quot;header&quot;);</span>
+	}
+	
+	private List&lt;SecurityContext&gt; securityContexts(){
+		
+<span class="fc" id="L32">		return Arrays.asList(SecurityContext.builder().securityReferences(sf()).build());</span>
+	}
+	
+	private List&lt;SecurityReference&gt; sf(){
+		
+<span class="fc" id="L37">		AuthorizationScope scope = new AuthorizationScope(&quot;global&quot;, &quot;accessEverything&quot;);</span>
+<span class="fc" id="L38">		return Arrays.asList(new SecurityReference(&quot;JWT&quot;, new AuthorizationScope[] {scope}));</span>
+		
+	}
+	
+	@Bean
+	public Docket api() {
+		
+<span class="fc" id="L45">		return new Docket(DocumentationType.SWAGGER_2)</span>
+<span class="fc" id="L46">				.apiInfo(getInfo())</span>
+<span class="fc" id="L47">				.securityContexts(securityContexts())</span>
+<span class="fc" id="L48">				.securitySchemes(Arrays.asList(apiKeys()))</span>
+<span class="fc" id="L49">				.select()</span>
+<span class="fc" id="L50">				.apis(RequestHandlerSelectors.any())</span>
+<span class="fc" id="L51">				.paths(PathSelectors.any()).build();</span>
+	}
+	
+	private ApiInfo getInfo() {
+		
+<span class="fc" id="L56">		return new ApiInfo(&quot;Naukri Application : Backend Course&quot;, </span>
+				&quot;Project is developed by Rockers&quot;, 
+				&quot;1.0&quot;, &quot;Terms of Services&quot;, 
+				new Contact(&quot;Rockers&quot;, &quot;https://rockers.org&quot;, &quot;helpdesk@naukri.com&quot;), 
+				&quot;Liences of Apis&quot;, 
+<span class="fc" id="L61">				&quot;API liscence URL&quot;, Collections.emptyList());</span>
+		
+	}
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

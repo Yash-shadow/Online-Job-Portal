@@ -1,0 +1,454 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CandidateService.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">naukri</a> &gt; <a href="index.source.html" class="el_package">com.service</a> &gt; <span class="el_source">CandidateService.java</span></div><h1>CandidateService.java</h1><pre class="source lang-java linenums">package com.service;
+
+import java.util.ArrayList;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Set;
+
+import javax.validation.ValidationException;
+
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Example;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.TransactionSystemException;
+
+import com.dao.CandidateDAO;
+
+import com.dao.ProjectDAO;
+import com.dao.SkillDAO;
+import com.dto.CandidateDTO;
+import com.dto.ProfileDTO;
+import com.dto.ProjectDTO;
+import com.dto.SkillDTO;
+import com.exception.CandidateNotFoundException;
+import com.exception.CandidateValidationExceptioncheck;
+import com.exception.skillNotFoundException;
+import com.enums.PostInterviewStatus;
+import com.exception.AlreadySelectedBySameEmployerException;
+import com.exception.MoonLightingException;
+import com.model.Candidate;
+import com.model.Job;
+import com.model.Employer;
+import com.model.Interview;
+import com.model.Project;
+import com.model.Skill;
+
+import io.jsonwebtoken.lang.Collections;
+
+@Service
+<span class="fc" id="L44">public class CandidateService {</span>
+	@Autowired
+	CandidateDAO candao;
+	
+	@Autowired
+	SkillDAO skilldao;
+	@Autowired
+	ProjectDAO projectDao;
+	
+	@Autowired
+	SkillService skillService;
+	
+	@Autowired
+	ProjectService projectService;
+	
+	
+	public Skill convertSkillDtoToSkill(SkillDTO dto) {
+<span class="fc" id="L61">	    Skill skill = new Skill();</span>
+<span class="fc" id="L62">	    skill.setSkillName(dto.getSkillName());</span>
+<span class="fc" id="L63">	    return skill;</span>
+	}
+	
+	public  Project convertProjectDtoToProject(ProjectDTO dto) {
+<span class="fc" id="L67">	    Project project= new Project();</span>
+<span class="fc" id="L68">	    project.setProjectName(dto.getProjectName());</span>
+<span class="fc" id="L69">	    project.setProjectDescription(dto.getProjectDescription());</span>
+	    
+	    
+<span class="fc" id="L72">	    return project;</span>
+	}
+
+	public Candidate findCandidateByEmailId(String emailId) {
+<span class="fc" id="L76">        return candao.findByEmailId(emailId);</span>
+    }
+    
+	
+	
+	public Candidate findCandidateByName(String name) {
+<span class="fc" id="L82">        return candao.findByCandidateName(name);</span>
+	    
+	}
+	
+
+	
+	//for addwhilecheckingskill
+
+	//dealing with profile userstory
+	public void addProfile(ProfileDTO profile) {
+<span class="fc" id="L92">	       Candidate c = new Candidate();</span>
+	       
+<span class="fc" id="L94">	       c.setCandidateName(profile.getCandidateName());</span>
+<span class="fc" id="L95">	       c.setAge(profile.getAge());</span>
+<span class="fc" id="L96">	       c.setEducationQualification(profile.getEducationQualification());</span>
+<span class="fc" id="L97">	       c.setLocation(profile.getLocation());</span>
+<span class="fc" id="L98">	       c.setExperience(profile.getExperience());</span>
+<span class="fc" id="L99">	       c.setEmailId(profile.getEmailId());</span>
+<span class="fc" id="L100">	       c.setPassword(profile.getPassword());</span>
+<span class="fc" id="L101">	       c.setExperience(profile.getExperience());</span>
+	       
+<span class="fc" id="L103">	       List&lt;Project&gt; projectList = new ArrayList&lt;&gt;();</span>
+	       
+<span class="fc bfc" id="L105" title="All 2 branches covered.">	      for (ProjectDTO pdt : profile.getProjectDTOList()) {</span>
+<span class="fc" id="L106">	          projectList.add(convertProjectDtoToProject(pdt));</span>
+<span class="fc" id="L107">	      }</span>
+	      
+//	       System.out.println(c);
+<span class="fc" id="L110">	      c.setProjectList(projectList);</span>
+	       
+<span class="fc bfc" id="L112" title="All 2 branches covered.">	       for(Project pro : projectList ) {</span>
+	    	   
+<span class="fc" id="L114">	    	   pro.setCandidate(c);</span>
+	    	   
+<span class="fc" id="L116">	       }</span>
+	      
+<span class="fc" id="L118">	       Set&lt;Skill&gt; skillSet = new HashSet&lt;&gt;();</span>
+	       
+<span class="pc bpc" id="L120" title="1 of 2 branches missed.">	       for (SkillDTO pdt : profile.getSkillDTOSet()) {</span>
+<span class="nc" id="L121">	           skillSet.add(convertSkillDtoToSkill(pdt));</span>
+<span class="nc" id="L122">	          }</span>
+
+	       
+	       
+	       
+<span class="fc" id="L127">	       Set&lt;Skill&gt; noRepSkills = skillService.addingSkillsWithNoRepetation(skillSet);</span>
+	      
+	       
+<span class="fc" id="L130">	      c.setSkillSet(noRepSkills);</span>
+	      try {
+<span class="fc" id="L132">	       candao.save(c);</span>
+	      }
+<span class="fc" id="L134">	      catch(ValidationException v)</span>
+	      {
+<span class="fc" id="L136">	          throw new CandidateValidationExceptioncheck(&quot;hey there check the docs for validation errors&quot;);</span>
+<span class="fc" id="L137">	      }</span>
+	        
+<span class="fc" id="L139">	    }</span>
+	
+	
+	
+	
+	
+	
+	
+	  //just an extra thing adding project id
+	public void addProjectbyId(int id, List&lt;ProjectDTO&gt; project ) throws CandidateNotFoundException  {
+	    
+	    try {
+	        
+<span class="fc" id="L152">	      Candidate c = candao.findById(id).get();</span>
+<span class="fc" id="L153">	      List&lt;Project&gt; listPro = new ArrayList&lt;&gt;();</span>
+<span class="fc bfc" id="L154" title="All 2 branches covered.">          for(ProjectDTO proDTO : project) {</span>
+<span class="fc" id="L155">              Project p1 = new Project();</span>
+<span class="fc" id="L156">              p1.setProjectName(proDTO.getProjectName());</span>
+<span class="fc" id="L157">              p1.setProjectDescription(proDTO.getProjectDescription());</span>
+<span class="fc" id="L158">              p1.setCandidate(c);</span>
+<span class="fc" id="L159">              listPro.add(p1);</span>
+              
+<span class="fc" id="L161">          }</span>
+<span class="fc" id="L162">	      c.getProjectList().addAll(listPro);</span>
+<span class="fc" id="L163">	     candao.save(c);</span>
+	    }
+<span class="fc" id="L165">	    catch(NoSuchElementException n) {</span>
+<span class="fc" id="L166">	        throw new CandidateNotFoundException(&quot;Check the id entered&quot;);</span>
+	        
+<span class="fc" id="L168">	    }</span>
+	      
+	     
+<span class="fc" id="L171">	}</span>
+
+  
+	
+
+   
+	//just an extra thing updating location by candidate id 
+	 public void updateLocationByCandidateId( int CandidateId,String loc) throws NoSuchElementException {
+<span class="fc" id="L179">	        Candidate c = candao.findById(CandidateId).get();</span>
+
+	        
+<span class="fc" id="L182">	        c.setLocation(loc);</span>
+<span class="fc" id="L183">	        candao.save(c);</span>
+	        
+<span class="fc" id="L185">	    }</span>
+	 
+	 
+	 
+	 
+	 
+	  //adding skill by id
+	    public void addSkillDTOByCandidateId(int id, SkillDTO cs) throws CandidateNotFoundException {
+	        try {
+<span class="fc" id="L194">	        Skill skill = convertSkillDtoToSkill(cs);</span>
+	        
+<span class="fc" id="L196">	         Candidate c = candao.findById(id).get();</span>
+	         
+	   
+	         
+	         
+	         
+<span class="fc" id="L202">	         Set&lt;Skill&gt; skillSet = new HashSet&lt;&gt;();</span>
+<span class="fc" id="L203">	         skillSet.add(skill);</span>
+
+<span class="fc" id="L205">	         Set&lt;Skill&gt; noRepSkills = skillService.addingSkillsWithNoRepetation(skillSet);</span>
+<span class="fc" id="L206">	        c.getSkillSet().addAll(noRepSkills);</span>
+	            
+<span class="fc" id="L208">	                candao.save(c);</span>
+	        }
+<span class="fc" id="L210">	        catch(NoSuchElementException n) {</span>
+<span class="fc" id="L211">	            throw new CandidateNotFoundException(&quot;Candidate User Not Found&quot;);</span>
+	            
+<span class="fc" id="L213">	        }</span>
+
+<span class="fc" id="L215">	    }   </span>
+	    
+	    
+	  public void removeSkillbyCanidateIdAndSkillName(int candidateId,String skillName) throws skillNotFoundException, CandidateNotFoundException {
+	      try {
+<span class="fc" id="L220">	      Candidate c = candao.findById(candidateId).get();</span>
+      
+<span class="fc" id="L222">      Skill skill = skilldao.findBySkillNameIgnoreCase(skillName);</span>
+<span class="fc bfc" id="L223" title="All 2 branches covered.">      if(skill==null) {</span>
+<span class="fc" id="L224">          throw new skillNotFoundException(&quot;No such skill is linked with candidate&quot;);</span>
+      }
+<span class="fc" id="L226">      c.getSkillSet().remove(skill);</span>
+<span class="fc" id="L227">      candao.save(c);</span>
+	      }
+<span class="fc" id="L229">	      catch(NoSuchElementException e) {</span>
+<span class="fc" id="L230">	          throw new CandidateNotFoundException(&quot;No candidate is found while checking skill&quot;);</span>
+<span class="fc" id="L231">	      }</span>
+<span class="fc" id="L232">  }</span>
+	    
+	
+
+	//in case need a exception 
+	    
+	   public Candidate getCandidateById(int id) throws CandidateNotFoundException {
+	       try {
+<span class="fc" id="L240">	           Candidate c = candao.findById(id).get();</span>
+<span class="fc" id="L241">	           return c;</span>
+	       }
+<span class="fc" id="L243">	       catch(NoSuchElementException n) {</span>
+<span class="fc" id="L244">	           throw new CandidateNotFoundException(&quot;Candidate not found&quot;);</span>
+	       }
+	   }
+     
+
+	
+	   
+     //get all candidates
+	    public List&lt;Candidate&gt; getAllCandidates() throws CandidateNotFoundException {
+<span class="fc" id="L253">	        List&lt;Candidate&gt; temp =candao.findAll();</span>
+<span class="fc bfc" id="L254" title="All 2 branches covered.">	        if (temp.isEmpty()) {</span>
+<span class="fc" id="L255">	            throw new CandidateNotFoundException(&quot;Data Base is Empty&quot;);</span>
+	        }
+<span class="fc" id="L257">	        return temp;</span>
+	        
+	    }
+	 
+	    public void updateProfile(int id,ProfileDTO profile) throws CandidateNotFoundException {
+	        try {
+	        
+<span class="fc" id="L264">	        Candidate c = candao.findById(id).get();</span>
+	           
+<span class="fc" id="L266">	           c.setCandidateName(profile.getCandidateName());</span>
+<span class="fc" id="L267">	           c.setAge(profile.getAge());</span>
+<span class="fc" id="L268">	           c.setEducationQualification(profile.getEducationQualification());</span>
+<span class="fc" id="L269">	           c.setLocation(profile.getLocation());</span>
+<span class="fc" id="L270">	           c.setExperience(profile.getExperience());</span>
+<span class="fc" id="L271">	           c.setEmailId(profile.getEmailId());</span>
+<span class="fc" id="L272">	           c.setPassword(profile.getPassword());</span>
+	           
+<span class="fc" id="L274">	           List&lt;Project&gt; projectList = new ArrayList&lt;&gt;();</span>
+	           
+<span class="pc bpc" id="L276" title="1 of 2 branches missed.">	          for (ProjectDTO pdt : profile.getProjectDTOList()) {</span>
+<span class="nc" id="L277">	              projectList.add(convertProjectDtoToProject(pdt));</span>
+<span class="nc" id="L278">	          }</span>
+	          
+//	         System.out.println(c);
+<span class="fc" id="L281">	          c.setProjectList(projectList);</span>
+	           
+<span class="pc bpc" id="L283" title="1 of 2 branches missed.">	           for(Project pro : projectList ) {</span>
+	               
+<span class="nc" id="L285">	               pro.setCandidate(c);</span>
+	               
+<span class="nc" id="L287">	           }</span>
+	          
+<span class="fc" id="L289">	           Set&lt;Skill&gt; skillSet = new HashSet&lt;&gt;();</span>
+	           
+<span class="pc bpc" id="L291" title="1 of 2 branches missed.">	           for (SkillDTO pdt : profile.getSkillDTOSet()) {</span>
+<span class="nc" id="L292">	               skillSet.add(convertSkillDtoToSkill(pdt));</span>
+<span class="nc" id="L293">	              }</span>
+	           
+	           
+	           
+<span class="fc" id="L297">	           Set&lt;Skill&gt; noRepSkills = skillService.addingSkillsWithNoRepetation(skillSet);</span>
+	          
+	           
+<span class="fc" id="L300">	          c.setSkillSet(noRepSkills);</span>
+	         
+<span class="fc" id="L302">	           candao.save(c);</span>
+	          }
+<span class="nc" id="L304">	          catch(ValidationException v)</span>
+	          {
+<span class="nc" id="L306">	              throw new CandidateValidationExceptioncheck(&quot;hey there check the docs for validation errors&quot;);</span>
+	          }
+<span class="fc" id="L308">	           catch (NoSuchElementException n) {</span>
+<span class="fc" id="L309">               throw new CandidateNotFoundException(&quot;Check the id u r enter the data into&quot;);</span>
+            }
+<span class="fc" id="L311">	        catch(TransactionSystemException t) {</span>
+<span class="fc" id="L312">	            throw new CandidateValidationExceptioncheck(&quot;hey there check the docs for validation errors&quot;);</span>
+<span class="fc" id="L313">	        }</span>
+<span class="fc" id="L314">	    }</span>
+
+	
+	public void updateCandidate(Candidate c) {
+		
+<span class="nc" id="L319">		candao.save(c);</span>
+		
+		
+<span class="nc" id="L322">	}</span>
+	
+	
+	public Boolean deletebyid(int id) throws CandidateNotFoundException {
+	   try {
+	    
+<span class="fc" id="L328">		candao.deleteById(id);</span>
+<span class="fc" id="L329">		 return true;</span>
+	   }
+<span class="fc" id="L331">	   catch(EmptyResultDataAccessException x) {</span>
+	    
+<span class="fc" id="L333">	       throw new CandidateNotFoundException(&quot;no candidate found&quot;);</span>
+	       
+	   }
+	}
+	
+	
+	public String deleteAllCandidate() {
+<span class="fc" id="L340">		candao.deleteAll();</span>
+<span class="fc" id="L341">		return &quot;Successfully deleted all the Candidate&quot;;</span>
+	}
+	
+
+	//rating  by id and interview id
+	
+	
+	
+	public void checkIfAlreadySelectedByEmployer(Candidate candidate, Employer employer) throws AlreadySelectedBySameEmployerException, MoonLightingException {
+<span class="fc" id="L350">	  List&lt;Interview&gt; interviewList = candidate.getInterviewList();</span>
+<span class="fc bfc" id="L351" title="All 2 branches covered.">	  for (Interview i: interviewList) {</span>
+<span class="fc bfc" id="L352" title="All 2 branches covered.">	    if (i.getPostInterviewStatus().equals(PostInterviewStatus.SELECTED)) {</span>
+<span class="fc" id="L353">	      Employer e = i.getEmployer();</span>
+<span class="fc bfc" id="L354" title="All 2 branches covered.">	      if (e.getEmployerId() == employer.getEmployerId())</span>
+<span class="fc" id="L355">	        throw new AlreadySelectedBySameEmployerException(i.getEmployer().getEmployerName());</span>
+	      else
+<span class="fc" id="L357">	        throw new MoonLightingException();</span>
+	    }
+<span class="fc" id="L359">	  }</span>
+<span class="fc" id="L360">	}</span>
+
+
+
+    public void save(Candidate cand2) {
+<span class="nc" id="L365">       candao.save(cand2);</span>
+<span class="nc" id="L366">    }</span>
+
+   
+    public List&lt;CandidateDTO&gt; candidateToDTO(List&lt;Candidate&gt; cands){
+<span class="fc" id="L370">    	List&lt;CandidateDTO&gt; cdtos = new ArrayList&lt;CandidateDTO&gt;();</span>
+<span class="fc bfc" id="L371" title="All 2 branches covered.">    	for (Candidate c: cands) {</span>
+<span class="fc" id="L372">    		cdtos.add(new CandidateDTO(c.getCandidateName(),c.getAge(),c.getEmailId(),c.getExperience(),c.getLocation(),c.getEducationQualification(),c.getSkillSet(),c.getProjectList()));</span>
+<span class="fc" id="L373">    	}</span>
+<span class="fc" id="L374">		return cdtos;    	</span>
+    }
+    public Set&lt;CandidateDTO&gt; candidateSetToDTO(Set&lt;Candidate&gt; cands){
+<span class="nc" id="L377">    	Set&lt;CandidateDTO&gt; cdtos = new HashSet&lt;CandidateDTO&gt;();</span>
+<span class="nc bnc" id="L378" title="All 2 branches missed.">    	for (Candidate c: cands) {</span>
+<span class="nc" id="L379">    		cdtos.add(new CandidateDTO(c.getCandidateName(),c.getAge(),c.getEmailId(),c.getExperience(),c.getLocation(),c.getEducationQualification(),c.getSkillSet(),c.getProjectList()));</span>
+<span class="nc" id="L380">    	}</span>
+<span class="nc" id="L381">		return cdtos;    	</span>
+    }
+    
+	public List&lt;CandidateDTO&gt; getAllCandidatesByExperience(int experience_lb, int experience_ub) {
+<span class="fc" id="L385">		List&lt;Candidate&gt; lc = candao.findByExperienceBetween(experience_lb, experience_ub);</span>
+<span class="fc" id="L386">		return this.candidateToDTO(lc);</span>
+	}
+	
+	public List&lt;CandidateDTO&gt; getAllCandidatesByQualification(String qualification) {
+<span class="fc" id="L390">		List&lt;Candidate&gt; lc =  candao.findAllByEducationQualification(qualification);</span>
+<span class="fc" id="L391">		return this.candidateToDTO(lc);</span>
+	}
+	
+	public List&lt;CandidateDTO&gt; getAllCandidatesBySkillSet(String skills){
+<span class="fc" id="L395">		List&lt;Candidate&gt; result = new ArrayList&lt;&gt;();</span>
+		
+<span class="fc" id="L397">		List&lt;Candidate&gt; candidates= candao.findAll();</span>
+		
+<span class="fc" id="L399">		String [] skillsRequired = skills.split(&quot;\\s*,\\s*&quot;);</span>
+
+//		System.out.println(Arrays.toString(skillsRequired));
+//		System.out.println(skills);
+		
+		
+<span class="fc bfc" id="L405" title="All 2 branches covered.">		for(Candidate c: candidates) {</span>
+			
+<span class="fc" id="L407">			Set&lt;String&gt; candSkills = new HashSet&lt;&gt;();</span>
+<span class="fc bfc" id="L408" title="All 2 branches covered.">			for (Skill skill : c.getSkillSet()) {</span>
+<span class="fc" id="L409">				candSkills.add(skill.getSkillName());</span>
+<span class="fc" id="L410">			}</span>
+			
+<span class="fc bfc" id="L412" title="All 2 branches covered.">			for(String skill : skillsRequired) {	</span>
+<span class="fc bfc" id="L413" title="All 2 branches covered.">				if( candSkills.contains(skill)) {</span>
+<span class="fc" id="L414">					result.add(c);</span>
+<span class="fc" id="L415">					break;	</span>
+				}	
+			}	
+<span class="fc" id="L418">		}</span>
+<span class="fc" id="L419">		return this.candidateToDTO(result);</span>
+	}
+	
+	
+	
+//	public void removeSkillbyId(int id, CandidateSkill cs) {
+//		Candidate c = candao.findById(id).get();
+//		c.getCanditationSkillSet().remove(cs);
+//		candao.save(c);
+//	}
+//	public void addProjectbyId(int id, Project pr ) {
+//		Candidate c = candao.findById(id).get();
+//		c.getProjectList().add(pr);
+//		candao.save(c);
+//		
+//	}
+//	public void removeProjectbyId(int id, Project pr ) {
+//		Candidate c = candao.findById(id).get();
+//		c.getProjectList().remove(pr);
+//		candao.save(c);
+//		
+//	}
+
+//	public Candidate findByName(String candidateName) {
+//		
+//		Candidate c = candao.findByCandidateName(candidateName);
+//		return c;
+//	}
+	
+//	public void query() {
+//		
+//	}
+	
+	
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

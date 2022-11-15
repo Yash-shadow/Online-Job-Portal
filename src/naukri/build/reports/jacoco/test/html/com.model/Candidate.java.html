@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Candidate.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">naukri</a> &gt; <a href="index.source.html" class="el_package">com.model</a> &gt; <span class="el_source">Candidate.java</span></div><h1>Candidate.java</h1><pre class="source lang-java linenums">package com.model;
+import java.util.Arrays;
+
+import java.util.HashSet;
+
+import java.util.List;
+import java.util.Set;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.JoinTable;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
+import javax.persistence.Table;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
+
+import org.hibernate.annotations.DynamicUpdate;
+
+import com.fasterxml.jackson.annotation.JsonIdentityInfo;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+import com.fasterxml.jackson.annotation.ObjectIdGenerators;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.*;
+import lombok.ToString;
+
+@Entity
+<span class="fc" id="L37">@Setter</span>
+@Getter 
+<span class="fc" id="L39">@NoArgsConstructor</span>
+@Table(name=&quot;candidate_table&quot;)
+public class Candidate {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+<span class="fc" id="L44">	private int candidateId;</span>
+	@NotNull
+<span class="fc" id="L46">	private String candidateName;</span>
+	@Min(value = 20)
+<span class="fc" id="L48">	private  int age;</span>
+	//@Min
+<span class="fc" id="L50">	private int experience;</span>
+<span class="fc" id="L51">	private String location;</span>
+<span class="fc" id="L52">	private String educationQualification;</span>
+	
+	@Column(unique = true)
+	@NotNull
+<span class="fc" id="L56">	private String emailId;</span>
+	
+	@NotNull
+<span class="fc" id="L59">	private String password;</span>
+	
+	//relations
+
+    
+<span class="pc" id="L64">	  @ManyToMany(fetch = FetchType.LAZY,cascade = {CascadeType.PERSIST,CascadeType.MERGE})</span>
+	  @JoinTable(
+	             name=&quot;CANDIDATE_SKILL_TABLE&quot;,
+	             joinColumns= {@JoinColumn(name=&quot;candidate_id&quot;)},
+	             inverseJoinColumns = {@JoinColumn(name=&quot;skill_id&quot;)}
+	             )
+<span class="fc" id="L70">	private Set&lt;Skill&gt; skillSet = new HashSet&lt;&gt;();</span>
+	  
+<span class="pc" id="L72">	  @ManyToMany(fetch = FetchType.LAZY,cascade = {CascadeType.PERSIST,CascadeType.MERGE})</span>
+	  @JoinTable(
+	      name=&quot;CANDIDATE_JOB_TABLE&quot;,
+	      joinColumns= {@JoinColumn(name=&quot;candidate_id&quot;)},
+	      inverseJoinColumns = {@JoinColumn(name=&quot;job_id&quot;)}
+	             )
+<span class="fc" id="L78">	private Set&lt;Job&gt; jobSet = new HashSet&lt;&gt;();</span>
+	  
+	  
+	@JsonManagedReference(value=&quot;candidate_interview&quot;)
+	@OneToMany(cascade = CascadeType.ALL,mappedBy = &quot;candidate&quot;)
+<span class="fc" id="L83">	private List&lt;Interview&gt; interviewList;</span>
+	  
+	
+	   
+	 @OneToMany(orphanRemoval = true,fetch = FetchType.LAZY,cascade = {CascadeType.PERSIST,CascadeType.MERGE,CascadeType.REMOVE},mappedBy = &quot;candidate&quot;)
+<span class="fc" id="L88">    private List&lt;Project&gt; projectList;</span>
+
+
+
+	public Candidate(String candidateName, int age, int experience, String location, String educationQualification,
+			List&lt;Project&gt; projectList, Set&lt;Skill&gt; skillSet) {
+<span class="nc" id="L94">		super();</span>
+<span class="nc" id="L95">		this.candidateId = candidateId;</span>
+<span class="nc" id="L96">		this.candidateName = candidateName;</span>
+<span class="nc" id="L97">		this.age = age;</span>
+<span class="nc" id="L98">		this.experience = experience;</span>
+<span class="nc" id="L99">		this.location = location;</span>
+<span class="nc" id="L100">		this.educationQualification = educationQualification;</span>
+<span class="nc" id="L101">		this.emailId = emailId;</span>
+<span class="nc" id="L102">		this.password = password;</span>
+<span class="nc" id="L103">		this.projectList = projectList;</span>
+<span class="nc" id="L104">		this.skillSet = skillSet;</span>
+<span class="nc" id="L105">	}</span>
+
+	@Override
+	public String toString() {
+<span class="nc" id="L109">		StringBuilder builder = new StringBuilder();</span>
+<span class="nc" id="L110">		builder.append(&quot;Candidate [candidateName=&quot;).append(candidateName).append(&quot;, age=&quot;).append(age)</span>
+<span class="nc" id="L111">				.append(&quot;, experience=&quot;).append(experience).append(&quot;, location=&quot;).append(location)</span>
+<span class="nc" id="L112">				.append(&quot;, educationQualification=&quot;).append(educationQualification).append(&quot;, skillSet=&quot;)</span>
+<span class="nc" id="L113">				.append(skillSet).append(&quot;]&quot;);</span>
+<span class="nc" id="L114">		return builder.toString();</span>
+	}
+	
+}
+
+
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

@@ -1,0 +1,101 @@
+plugins {
+	id 'org.springframework.boot' version '2.6.12'
+    id 'io.spring.dependency-management' version '1.0.14.RELEASE'
+    id 'java'
+    id 'jacoco'
+    id "org.sonarqube" version "3.3"
+}
+jacoco {
+    toolVersion = "0.8.7"
+    reportsDir = file("$buildDir/jacoco")
+    reportsDir = file("$buildDir/reports/jacoco")
+}
+test {
+
+    forkEvery = 1
+
+    finalizedBy jacocoTestReport
+}
+jacocoTestReport {
+    dependsOn test
+     reports {
+      xml.enabled true
+   }
+   
+   afterEvaluate {
+        classDirectories.setFrom(files(classDirectories.files.collect {
+            fileTree(dir: it, exclude: [
+                "com/baeldung/**/ExcludedPOJO.class",
+                "com/baeldung/**/*DTO.*",
+                "$buildDir/**/dto/*"
+            ])
+        }))
+    }
+}
+
+
+group = 'com.sprint'
+version = '0.0.1-SNAPSHOT'
+sourceCompatibility = '1.8'
+
+repositories {
+	mavenCentral()
+}
+
+dependencies {
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+	implementation 'org.springframework.boot:spring-boot-starter-data-rest'
+	implementation 'org.springframework.boot:spring-boot-starter-web'
+	runtimeOnly 'org.postgresql:postgresql'
+	testImplementation 'org.springframework.boot:spring-boot-starter-test'
+	
+	//for swagger ui
+	implementation group: 'io.springfox', name: 'springfox-boot-starter', version: '3.0.0'         
+    implementation 'io.springfox:springfox-swagger-ui:3.0.0'
+
+    
+    
+	implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.4.1'
+
+    // implementation group: 'org.hibernate', name: 'hibernate-validator', version: '3.1.0.CR2'
+
+
+	//lombock
+	compileOnly 'org.projectlombok:lombok:1.18.24'
+    annotationProcessor 'org.projectlombok:lombok:1.18.24'
+    
+    testCompileOnly 'org.projectlombok:lombok:1.18.24'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.24'
+    
+    //http client
+    implementation group: 'org.apache.httpcomponents', name: 'httpclient', version: '4.4.1'
+    //validator
+    
+   	// implementation group: 'org.hibernate', name: 'hibernate-validator', version: '3.1.0.CR2'
+    //Security
+    implementation 'org.springframework.boot:spring-boot-starter-security'
+    testImplementation 'org.springframework.security:spring-security-test'
+    
+    //JJWT Token
+    // https://mvnrepository.com/artifact/io.jsonwebtoken/jjwt
+	implementation group: 'io.jsonwebtoken', name: 'jjwt', version: '0.9.0'
+	
+	//JWT Token for above java version 8
+	// https://mvnrepository.com/artifact/javax.xml.bind/jaxb-api
+	implementation group: 'javax.xml.bind', name: 'jaxb-api', version: '2.3.0'
+
+
+   	implementation 'org.springframework.boot:spring-boot-starter-validation'
+   	//Not sure 
+   	implementation 'org.springframework.boot:spring-boot-starter-batch'
+  testImplementation 'org.springframework.boot:spring-boot-starter-test'
+  testImplementation 'org.springframework.batch:spring-batch-test'
+   	
+   	
+   	
+   	
+
+}
+tasks.named('test') {
+	useJUnitPlatform()
+}

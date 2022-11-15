@@ -1,0 +1,544 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>CandidateController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">naukri</a> &gt; <a href="index.source.html" class="el_package">com.controller</a> &gt; <span class="el_source">CandidateController.java</span></div><h1>CandidateController.java</h1><pre class="source lang-java linenums">package com.controller;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.NoSuchElementException;
+import java.util.Set;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.validation.ValidationException;
+
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.dao.CandidateDAO;
+import com.dao.EmployerDAO;
+import com.dao.InterviewDAO;
+import com.dao.JobDAO;
+import com.dto.ProfileDTO;
+import com.dto.ProjectDTO;
+import com.dto.RatingFeedbackDTO;
+import com.dto.SkillDTO;
+import com.enums.PostInterviewStatus;
+import com.enums.PreInterviewStatus;
+import com.exception.CandidateNotFoundException;
+import com.exception.CandidateValidationExceptioncheck;
+import com.exception.FormatException;
+import com.exception.JobNotFoundException;
+import com.exception.NoSuchInterviewFoundException;
+import com.exception.NoSuchJobFoundException;
+import com.exception.NullValueException;
+import com.exception.ProjectNotFoundException;
+import com.exception.exceptions;
+import com.exception.feedbackException;
+import com.exception.skillNotFoundException;
+import com.helper.DecryptUserDetails;
+
+import com.helper.JwtUtil;
+
+import com.model.Candidate;
+import com.model.Employer;
+import com.model.Interview;
+
+import com.service.CandidateService;
+import com.service.InterviewService;
+import com.service.JobService;
+import com.service.ProjectService;
+
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+
+import com.model.Job;
+import com.model.Project;
+
+
+@RestController
+<span class="fc" id="L69">public class CandidateController {</span>
+    @Autowired
+    CandidateService candidateService;
+    
+    @Autowired
+    CandidateDAO candao;
+    @Autowired
+    InterviewService interviewService;
+    @Autowired
+    ProjectService projectService;
+     
+    @Autowired
+    CandidateDAO candidateDAO;
+    
+    @Autowired
+    EmployerDAO employerDAO;
+
+    @Autowired
+    JobDAO jobDAO;
+
+    @Autowired
+    InterviewDAO interviewDAO;
+    
+    @Autowired
+    JobService jobService;
+    
+    @Autowired
+    DecryptUserDetails decryptUser;
+    
+	
+	//user Story 2 Candidate should be able to create a profile by mentioning his details 
+    //like educational qualification ,technical skills ,experience ,projects 
+    //worked upon etc 
+    // Can be linked using user should be linked to user register
+	@ApiOperation(value = &quot;Add Candidate&quot;,notes=&quot;Register and  Add profile&quot;,nickname = &quot;addprofile&quot; )
+    @ApiResponses(value= {@ApiResponse(code=200, message=&quot;Add profile&quot;)})
+	@PostMapping(&quot;/addProfile&quot;)
+    public ResponseEntity addProfile(@RequestBody ProfileDTO profile)throws CandidateValidationExceptioncheck {
+		
+        try {
+<span class="fc" id="L109">        candidateService.addProfile(profile);</span>
+<span class="fc" id="L110">        return new  ResponseEntity&lt;&gt;(&quot;Candidate added successfully&quot;</span>
+                ,HttpStatus.ACCEPTED);
+        }
+<span class="fc" id="L113">        catch(CandidateValidationExceptioncheck c) {</span>
+<span class="fc" id="L114">            throw new CandidateValidationExceptioncheck(c.getMessage());</span>
+        }
+       
+        
+    }
+	 
+	//user Story 2 -able to add Project by Id
+	@ApiOperation(value = &quot;Adding Project&quot;,notes=&quot;Candidate Id is fetched from token&quot;,nickname = &quot;Add Project By Candidate Id&quot;)
+    @PostMapping(&quot;/addProjectById&quot;)
+    public ResponseEntity addProject(HttpServletRequest request, @RequestBody List&lt;ProjectDTO&gt; project) throws NullPointerException, CandidateNotFoundException, FormatException, NullValueException{
+       
+     
+           
+<span class="fc" id="L127">           String emailId = decryptUser.decryptEmailId(request);</span>
+           
+<span class="fc" id="L129">           int candidateId = candidateService.findCandidateByEmailId(emailId).getCandidateId();</span>
+            
+<span class="fc" id="L131">           candidateService.addProjectbyId(candidateId, project);</span>
+            
+
+<span class="fc" id="L134">        return new  ResponseEntity&lt;&gt;(&quot;Project added successfully&quot;</span>
+                ,HttpStatus.ACCEPTED);
+      
+       
+    }
+	
+	
+	//user Story 2 -able to remove project 
+	@ApiOperation(value = &quot;Removing Project&quot;,notes=&quot;Candidate Id is fetched from token&quot;,nickname = &quot;RPC&quot;)
+	@DeleteMapping(&quot;/removeProject/{projectid}&quot;)
+	public ResponseEntity removeProjectByProjectId
+	(@PathVariable(&quot;projectid&quot;) String projectid ) throws ProjectNotFoundException, FormatException {
+	    try {
+	        
+<span class="fc" id="L148">	        projectService.removeProjectById(Integer.parseInt(projectid));</span>
+<span class="fc" id="L149">	        return new  ResponseEntity&lt;&gt;(&quot;Candidate project removed successfully&quot;</span>
+	                ,HttpStatus.ACCEPTED);
+	    }
+	    
+<span class="nc" id="L153">	    catch(ProjectNotFoundException p) {</span>
+<span class="nc" id="L154">	    throw new ProjectNotFoundException(p.getMessage());</span>
+	    }
+<span class="fc" id="L156">	    catch(NumberFormatException n) {</span>
+<span class="fc" id="L157">            throw new FormatException(&quot;Check the format of the input or wrong user id&quot;);</span>
+
+	    }
+      
+	}
+	
+	
+	@ApiOperation(value = &quot;Removing Project&quot;,notes=&quot;Candidate Id is fetched from token for and removal of projectname&quot;,nickname = &quot;RPC&quot;)
+	@DeleteMapping(&quot;/removeProjectByName/{ProjectName}&quot;)
+	public ResponseEntity removeProjectByProjectName
+	(HttpServletRequest request,@PathVariable(&quot;ProjectName&quot;) String projectName ) throws ProjectNotFoundException, FormatException {
+	    try {
+<span class="fc" id="L169">	    	  String emailId = decryptUser.decryptEmailId(request);</span>
+	           
+<span class="fc" id="L171">	         Candidate candidate = candidateService.findCandidateByEmailId(emailId);</span>
+	         
+<span class="fc" id="L173">	        projectService.removeProjectByNameAndCandidate(candidate,projectName);</span>
+<span class="fc" id="L174">	        return new  ResponseEntity&lt;&gt;(&quot;Candidate project removed successfully&quot;</span>
+	                ,HttpStatus.ACCEPTED);
+	    }
+	    
+<span class="nc" id="L178">	    catch(ProjectNotFoundException p) {</span>
+<span class="nc" id="L179">	    throw new ProjectNotFoundException(p.getMessage());</span>
+	    }
+<span class="nc" id="L181">	    catch(NumberFormatException n) {</span>
+<span class="nc" id="L182">            throw new FormatException(&quot;Check the format of the input or wrong user id&quot;);</span>
+
+	    }
+      
+	}
+	
+	    
+	@ApiOperation(value = &quot;UpdatingLocation&quot;,notes=&quot;Updating Profile Location and id taken from the token&quot;,nickname = &quot;ULP&quot;)
+    @ApiResponses(value= {@ApiResponse(code=200, message=&quot;all jobs&quot;)})
+	   @PostMapping(&quot;/updateLocation&quot;)
+	public ResponseEntity updateLocationById(HttpServletRequest request,@RequestBody String str)throws CandidateValidationExceptioncheck, CandidateNotFoundException {
+	        try {
+<span class="fc" id="L194">	            String emailId = decryptUser.decryptEmailId(request);</span>
+	            
+<span class="fc" id="L196">	            int candidateId = candidateService.findCandidateByEmailId(emailId).getCandidateId();</span>
+	        
+<span class="fc" id="L198">	            candidateService.updateLocationByCandidateId(candidateId, str);</span>
+
+<span class="fc" id="L200">            return new  ResponseEntity&lt;&gt;(&quot;Candidate updated location&quot;,HttpStatus.OK);</span>
+	        }
+<span class="nc" id="L202">	        catch(ValidationException v) {</span>
+<span class="nc" id="L203">	            throw new CandidateValidationExceptioncheck(&quot;validation error&quot;);</span>
+	        }
+<span class="nc" id="L205">	        catch(NoSuchElementException e)</span>
+	        {
+<span class="nc" id="L207">	            throw new CandidateNotFoundException(&quot;Ek bar id tho dheko &quot;);</span>
+	        }
+
+
+	    }
+	   
+     //add skill to a particular candidate
+     @ApiOperation(value = &quot;Add&quot;,notes=&quot;Add Candidate Skill and id is taken from the Token&quot;,nickname = &quot;Add Skill to Candidate&quot; )
+     @PatchMapping(&quot;/addSkillToCandidate&quot;)
+     public ResponseEntity addSkillByCandidateId(HttpServletRequest request,@RequestBody SkillDTO cs) throws CandidateNotFoundException {
+         try {
+<span class="fc" id="L218">             String emailId = decryptUser.decryptEmailId(request);</span>
+             
+<span class="fc" id="L220">             int candidateId = candidateService.findCandidateByEmailId(emailId).getCandidateId();</span>
+           
+<span class="fc" id="L222">              candidateService.addSkillDTOByCandidateId(candidateId, cs);</span>
+      
+<span class="fc" id="L224">             return new  ResponseEntity&lt;&gt;(&quot;Candidate skill added succefully &quot;,HttpStatus.OK);</span>
+      }
+<span class="nc" id="L226">         catch(NoSuchElementException ex){</span>
+<span class="nc" id="L227">             throw new CandidateNotFoundException(&quot;check id&quot;);</span>
+         }
+         
+     }
+     
+     @ApiOperation(value = &quot;Add&quot;,notes=&quot;remove Skill by CanidateId taken from the token And SkillName&quot;,nickname = &quot;Add Skill to Candidate&quot; ) 
+     @PatchMapping(&quot;/removeskillbyCanidateIdAndSkillName/{skillName}&quot;)
+     public ResponseEntity removeSkillbyCanidateIdAndSkillName(HttpServletRequest request,@PathVariable(&quot;skillName&quot;) String skillName) throws NumberFormatException, skillNotFoundException, CandidateNotFoundException {
+         try {
+<span class="fc" id="L236">             String emailId = decryptUser.decryptEmailId(request);</span>
+             
+<span class="fc" id="L238">             int candidateId = candidateService.findCandidateByEmailId(emailId).getCandidateId();</span>
+<span class="fc" id="L239">         candidateService.removeSkillbyCanidateIdAndSkillName(candidateId,skillName);</span>
+ 
+<span class="fc" id="L241">         return new  ResponseEntity&lt;&gt;(&quot;Candidate skill removed succefully &quot;,HttpStatus.OK);</span>
+         }
+         
+<span class="nc" id="L244">         catch(skillNotFoundException s) {</span>
+<span class="nc" id="L245">             throw new  skillNotFoundException(s.getMessage());</span>
+             
+         }
+ }
+     
+     @ApiOperation(value = &quot;getallCandidates&quot;,notes=&quot;Get all Candidates&quot;,nickname = &quot;getallCandidates&quot; ) 
+     @GetMapping(&quot;/getAllCandidates&quot;)
+     public List&lt;Candidate&gt; getallCandidates() throws CandidateNotFoundException {
+          try {
+              
+<span class="nc" id="L255">          return candidateService.getAllCandidates();</span>
+          }
+<span class="nc" id="L257">          catch(CandidateNotFoundException v) {</span>
+<span class="nc" id="L258">              throw new CandidateNotFoundException(v.getMessage());</span>
+          }
+          
+      }
+     
+
+     @GetMapping(&quot;/findCandidateById/{id}&quot;)
+     public ResponseEntity getCandidatebyid(@PathVariable int  id  ) throws CandidateNotFoundException{
+    
+           try {
+<span class="fc" id="L268">               return new ResponseEntity&lt;&gt;(candidateService.getCandidateById(id),HttpStatus.FOUND);</span>
+
+           }
+<span class="nc" id="L271">           catch (NoSuchElementException c) {</span>
+               
+<span class="nc" id="L273">               throw new CandidateNotFoundException(&quot;User Not found&quot;);</span>
+           
+           }
+       }
+  
+     @ApiOperation(value = &quot;candidateFeedbackRating&quot;,notes=&quot;candidateFeedbackRating user story 7 8 &quot;,nickname = &quot;candidateFeedbackRating&quot; )
+     @PostMapping(&quot;/candidateFeedbackRating/{interviewId}&quot;)
+     public ResponseEntity&lt;String&gt; feedbackRating(@PathVariable(&quot;interviewId&quot;) String id, @RequestBody RatingFeedbackDTO dto) throws NumberFormatException, feedbackException {
+        try {
+         
+           
+<span class="fc" id="L284">               interviewService.provideCandidateFeedback(Integer.parseInt(id), dto);</span>
+           
+               // TODO Auto-generated catch block
+              
+         
+           
+<span class="fc" id="L290">         return new ResponseEntity&lt;&gt;(&quot;Feedback and rating by candidate saved&quot;, HttpStatus.OK);</span>
+    }
+<span class="nc" id="L292">    catch (feedbackException e) {</span>
+    
+<span class="nc" id="L294">        throw new feedbackException(e.getMessage());</span>
+    }
+     
+   
+    }
+     
+     
+     
+     
+   @DeleteMapping(&quot;/deletecandidate/{id}&quot;)
+   public ResponseEntity deleteCandidatebyid(@PathVariable int  id ) throws CandidateNotFoundException {
+ 
+<span class="fc" id="L306">    candidateService.deletebyid(id);</span>
+ 
+<span class="fc" id="L308">   return new ResponseEntity(&quot;Candidate delete successfully&quot;,HttpStatus.FOUND);</span>
+   }
+ 
+   @ApiOperation(value = &quot;getJobsByIndustry&quot;,notes=&quot; candidate cand receive jobs based on lndustry user Story 3&quot;,nickname = &quot;getJobsByIndustry&quot; )
+   @GetMapping(&quot;/getJobsByIndustry/{industry}&quot;)
+   public ResponseEntity&lt;List&lt;Job&gt;&gt; getJobsByIndustry(@PathVariable String industry) {
+       
+<span class="fc" id="L315">   	List&lt;Job&gt; jobList = jobDAO.findByIndustry(industry);</span>
+<span class="fc" id="L316">       return new ResponseEntity&lt;&gt;(jobList, HttpStatus.OK);</span>
+   
+   }
+
+   @ApiOperation(value = &quot;getJobsByLocation&quot;,notes=&quot;candidate cand receive jobs based on their location user Story 3&quot;,nickname = &quot;getJobsByLocation&quot; )
+   @GetMapping(&quot;/getJobsByLocation/{location}&quot;)
+   public ResponseEntity&lt;List&lt;Job&gt;&gt; getJobsByLocation(@PathVariable String location) {
+       
+<span class="fc" id="L324">   	List&lt;Job&gt; jobList = jobDAO.findByLocation(location);</span>
+       
+<span class="fc" id="L326">       return new ResponseEntity&lt;&gt;(jobList, HttpStatus.OK);</span>
+   }
+   
+   @ApiOperation(value = &quot;getJobBySkill&quot;,notes=&quot;candidate cand receive jobs based on their skills user Story 4&quot;,nickname = &quot;getJobBySkill&quot; )
+   @PostMapping(&quot;/getJobBySkill&quot;)
+   public List&lt;Job&gt; getAllJobBySkill(@RequestBody String skillNames){
+		
+<span class="fc" id="L333">   	return jobService.getJobBySkillName(skillNames);</span>
+	}
+   
+   
+	@ApiOperation(value = &quot;Candidate views All Jobs&quot;,notes=&quot;user story 5&quot;,nickname = &quot;getall&quot; )
+	@ApiResponses(value= {@ApiResponse(code=200, message=&quot;all jobs&quot;)})
+	@GetMapping(&quot;/getAllJobs&quot;)
+    public ResponseEntity&lt;List&lt;Job&gt;&gt; getAllJobs() {
+		
+<span class="fc" id="L342">		List&lt;Job&gt; allJobs = jobDAO.findAll();</span>
+		
+<span class="fc" id="L344">        return new ResponseEntity&lt;&gt;(jobDAO.findAll(), HttpStatus.OK);</span>
+        
+	}
+   
+
+//    
+//   @PostMapping(&quot;/candidateAppliesForJob&quot;)
+//   public ResponseEntity&lt;String&gt; candidateAppliesForJob(@RequestParam(&quot;candidateId&quot;) String candidateId, @RequestParam(&quot;jobId&quot;) String jobId) throws exceptions {
+//   
+//	   try {	    
+//		    // assuming the candidate is already created,
+//		    // find the candidate, employer and job using the ids
+//		    Candidate c = candidateService.getCandidateById(Integer.parseInt(candidateId));
+//		    Job j = jobService.getJobById(Integer.parseInt(jobId));
+//		    Employer e = j.getCreatedBy();
+//		    
+//		    candidateService.checkIfAlreadySelectedByEmployer(c, e);
+//		    
+//		    // add the candidate to the candidate set of the job
+//		    j.getCandidateSet().add(c);
+//		    jobDAO.save(j);
+//		    
+//		    // create a new interview object unique to the employer, candidate, and job
+//		    Interview i = new Interview();
+//		    i.setCandidate(c);
+//		    i.setJob(j);
+//		    i.setEmployer(e);
+
+//		    i.setPreInterviewStatus(PreInterviewStatus.APPLIED);
+
+
+//		    i.setPostInterviewStatus(PostInterviewStatus.INVALID);
+//		    interviewDAO.save(i);
+//		    
+//		    
+//		    // now add the newly created interview to the interview list of employer
+//		    e.getInterviewList().add(i);
+//		    employerDAO.save(e);
+//		    
+//		    // also add this interview to the interview list of the employer
+//		    c.getInterviewList().add(i);
+//           candidateDAO.save(c);
+//           
+//           // and add it to interview list of the job
+//           j.getInterviewList().add(i);
+//           jobDAO.save(j);
+//		    
+//		    return new ResponseEntity&lt;&gt;(&quot;Candidate successfully applied for this job&quot;, HttpStatus.OK);
+//		  } catch (Exception e) {
+//		    return new ResponseEntity&lt;&gt;(e.getMessage(), HttpStatus.OK);
+//		  }
+//             
+//       }
+ 
+   //no service tests from here
+   @ApiOperation(value = &quot;updatecandidate&quot;,notes=&quot;updatecandidate need authentication token&quot;,nickname = &quot;updatecandidate&quot; )
+   	@PatchMapping(&quot;/updatecandidate&quot;)
+ 	public ResponseEntity updateCandidate( HttpServletRequest request,@RequestBody ProfileDTO candDto ) throws CandidateValidationExceptioncheck, CandidateNotFoundException, FormatException {
+  
+   
+       try {
+<span class="nc" id="L405">           String emailId = decryptUser.decryptEmailId(request);</span>
+           
+<span class="nc" id="L407">           int candidateId = candidateService.findCandidateByEmailId(emailId).getCandidateId();</span>
+           
+           
+<span class="nc" id="L410">           candidateService.updateProfile(candidateId,candDto);</span>
+<span class="nc" id="L411">           return new  ResponseEntity&lt;&gt;(&quot;Candidate updation failed, check id &quot;</span>
+                   ,HttpStatus.FORBIDDEN);
+       }
+<span class="nc" id="L414">       catch(ValidationException v) {</span>
+<span class="nc" id="L415">           throw new CandidateValidationExceptioncheck(&quot;validation error&quot;);</span>
+       } 
+<span class="nc" id="L417">       catch (NumberFormatException e) {</span>
+<span class="nc" id="L418">        throw new FormatException(&quot;Check the format &quot;);</span>
+    } 
+<span class="nc" id="L420">       catch (CandidateNotFoundException k) {</span>
+<span class="nc" id="L421">           throw new CandidateNotFoundException(k.getMessage());</span>
+
+    }
+ }
+	
+
+	 @ApiOperation(value = &quot;get job status&quot;,notes=&quot;candidadte gets his job status&quot;,nickname = &quot;updatecandidate&quot; )
+
+	 @GetMapping(&quot;/getjobstatus/{id}&quot;)
+	public List&lt;Interview&gt; findjob(@PathVariable  int id) throws CandidateNotFoundException {
+<span class="nc" id="L431">	   Candidate candidate = candidateService.getCandidateById(id);</span>
+<span class="nc" id="L432">	   List&lt;Interview&gt; interviewStatus = candidate.getInterviewList();</span>
+<span class="nc" id="L433">	   return  interviewStatus ;</span>
+	}
+
+	 @ApiOperation(value = &quot;candidateApplicationForJob&quot;,notes=&quot;candidateApplicationForJob&quot;,nickname = &quot;updatecandidate&quot; )
+	@PostMapping(&quot;/candidateApplicationForJob&quot;)
+	public ResponseEntity&lt;String&gt; candidateApplicationForJob(@RequestParam(&quot;candidateId&quot;) int candidateId, @RequestParam(&quot;jobId&quot;) int jobId) throws CandidateNotFoundException, NoSuchJobFoundException{
+<span class="nc" id="L439">			  Candidate c = null;</span>
+<span class="nc" id="L440">			  Job j = null;</span>
+			  
+<span class="nc" id="L442">			  c = candidateService.getCandidateById(candidateId);</span>
+<span class="nc bnc" id="L443" title="All 2 branches missed.">			  if (c==null) {</span>
+<span class="nc" id="L444">				  throw new CandidateNotFoundException(&quot;Candidate with id : &quot;+candidateId+&quot; not found&quot;);</span>
+			  }
+			  
+<span class="nc" id="L447">			  j = jobService.getJobById(jobId);</span>
+<span class="nc bnc" id="L448" title="All 2 branches missed.">			  if (j==null) {</span>
+<span class="nc" id="L449">				  throw new NoSuchJobFoundException(jobId);</span>
+			  }
+			  
+			  try {
+<span class="nc" id="L453">			    Employer e = j.getCreatedBy();</span>
+			    
+//			    j.getCandidateSet().add(c);
+			    
+<span class="nc" id="L457">			    Interview i = new Interview();</span>
+<span class="nc" id="L458">			    i.setCandidate(c);</span>
+<span class="nc" id="L459">			    i.setJob(j);</span>
+<span class="nc" id="L460">			    i.setEmployer(j.getCreatedBy());</span>
+<span class="nc" id="L461">			    i.setPreInterviewStatus(PreInterviewStatus.APPLIED);</span>
+<span class="nc" id="L462">			    i.setPostInterviewStatus(PostInterviewStatus.INVALID);</span>
+			    
+<span class="nc" id="L464">			    c.getInterviewList().add(i);</span>
+<span class="nc" id="L465">			    c.getJobSet().add(j);</span>
+<span class="nc" id="L466">			    candidateService.updateCandidate(c);</span>
+			    
+//			    jobDAO.save(j);
+//			    interviewDAO.save(i);
+			    
+			    // now add the newly created interview to interviewlist of employer
+//			    e.getInterviewList().add(i);
+//			    employerDAO.save(e);
+<span class="nc" id="L474">			  } catch (Exception e) {</span>
+			    
+//				System.out.println(e.getMessage());
+<span class="nc" id="L477">				return new ResponseEntity&lt;&gt;(&quot;Candidate could not apply for this job&quot;, HttpStatus.OK);</span>
+
+<span class="nc" id="L479">			  }</span>
+			  
+<span class="nc" id="L481">			  return new ResponseEntity&lt;&gt;(&quot;Candidate successfully applied for this job&quot;, HttpStatus.OK);</span>
+	}
+
+	 
+	@PatchMapping(&quot;/updateCandidate2&quot;)
+	public void updateCandidate(@RequestBody Candidate cand ){
+<span class="nc" id="L487">		candidateService.updateCandidate(cand);</span>
+<span class="nc" id="L488">	}</span>
+	
+//	OM
+
+	
+	   
+
+/*
+ * *************OM start******************
+ */
+	
+	
+
+	
+	
+//	@GetMapping(&quot;/getAllCandidatesByJobId/{jobId}&quot;)
+//	public ResponseEntity&lt;Set&lt;Candidate&gt;&gt; getAllCandidatesByJobId(@PathVariable Integer jobId) throws NoSuchJobFoundException{
+//		Job job= null;
+//		try {
+//			job = jobService.findJobById(jobId);
+//			return new ResponseEntity&lt;&gt;(job.getCandidateSet(), HttpStatus.OK);
+//		} catch (NoSuchJobFoundException e) {
+//			throw e;
+//		}
+//	}
+
+
+	/*
+	 * ********OM end***********
+	 */
+	
+	   @GetMapping(&quot;/getMyDetails&quot;)
+	     public ResponseEntity getMyDetails(HttpServletRequest request  ) throws CandidateNotFoundException{
+	    
+	           try {
+<span class="nc" id="L523">	        	   String emailId = decryptUser.decryptEmailId(request);</span>
+	               
+<span class="nc" id="L525">	               int candidateId = candidateService.findCandidateByEmailId(emailId).getCandidateId();</span>
+	           
+<span class="nc" id="L527">	               return new ResponseEntity&lt;&gt;(candidateService.getCandidateById(candidateId),HttpStatus.FOUND);</span>
+
+	           }
+<span class="nc" id="L530">	           catch (NoSuchElementException c) {</span>
+	               
+<span class="nc" id="L532">	               throw new CandidateNotFoundException(&quot;User Not found&quot;);</span>
+	           
+	           }
+	       }
+	
+	
+	
+	
+	
+	
+	
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

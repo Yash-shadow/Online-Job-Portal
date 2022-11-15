@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+<meta http-equiv="x-ua-compatible" content="IE=edge"/>
+<title>Test results - EmployerControllerMethodTests</title>
+<link href="../css/base-style.css" rel="stylesheet" type="text/css"/>
+<link href="../css/style.css" rel="stylesheet" type="text/css"/>
+<script src="../js/report.js" type="text/javascript"></script>
+</head>
+<body>
+<div id="content">
+<h1>EmployerControllerMethodTests</h1>
+<div class="breadcrumbs">
+<a href="../index.html">all</a> &gt; 
+<a href="../packages/com.sprint.naukri.html">com.sprint.naukri</a> &gt; EmployerControllerMethodTests</div>
+<div id="summary">
+<table>
+<tr>
+<td>
+<div class="summaryGroup">
+<table>
+<tr>
+<td>
+<div class="infoBox" id="tests">
+<div class="counter">3</div>
+<p>tests</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="failures">
+<div class="counter">0</div>
+<p>failures</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="ignored">
+<div class="counter">0</div>
+<p>ignored</p>
+</div>
+</td>
+<td>
+<div class="infoBox" id="duration">
+<div class="counter">0.961s</div>
+<p>duration</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+</td>
+<td>
+<div class="infoBox success" id="successRate">
+<div class="percent">100%</div>
+<p>successful</p>
+</div>
+</td>
+</tr>
+</table>
+</div>
+<div id="tabs">
+<ul class="tabLinks">
+<li>
+<a href="#tab0">Tests</a>
+</li>
+<li>
+<a href="#tab1">Standard output</a>
+</li>
+</ul>
+<div id="tab0" class="tab">
+<h2>Tests</h2>
+<table>
+<thead>
+<tr>
+<th>Test</th>
+<th>Duration</th>
+<th>Result</th>
+</tr>
+</thead>
+<tr>
+<td class="success">test1()</td>
+<td class="success">0.139s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testAddEmployer()</td>
+<td class="success">0.733s</td>
+<td class="success">passed</td>
+</tr>
+<tr>
+<td class="success">testGetAllEmployers()</td>
+<td class="success">0.089s</td>
+<td class="success">passed</td>
+</tr>
+</table>
+</div>
+<div id="tab1" class="tab">
+<h2>Standard output</h2>
+<span class="code">
+<pre>13:52:37.790 [Test worker] DEBUG org.springframework.test.context.BootstrapUtils - Instantiating CacheAwareContextLoaderDelegate from class [org.springframework.test.context.cache.DefaultCacheAwareContextLoaderDelegate]
+13:52:37.818 [Test worker] DEBUG org.springframework.test.context.BootstrapUtils - Instantiating BootstrapContext using constructor [public org.springframework.test.context.support.DefaultBootstrapContext(java.lang.Class,org.springframework.test.context.CacheAwareContextLoaderDelegate)]
+13:52:37.912 [Test worker] DEBUG org.springframework.test.context.BootstrapUtils - Instantiating TestContextBootstrapper for test class [com.sprint.naukri.EmployerControllerMethodTests] from class [org.springframework.boot.test.context.SpringBootTestContextBootstrapper]
+13:52:37.938 [Test worker] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper - Neither @ContextConfiguration nor @ContextHierarchy found for test class [com.sprint.naukri.EmployerControllerMethodTests], using SpringBootContextLoader
+13:52:37.948 [Test worker] DEBUG org.springframework.test.context.support.AbstractContextLoader - Did not detect default resource location for test class [com.sprint.naukri.EmployerControllerMethodTests]: class path resource [com/sprint/naukri/EmployerControllerMethodTests-context.xml] does not exist
+13:52:37.948 [Test worker] DEBUG org.springframework.test.context.support.AbstractContextLoader - Did not detect default resource location for test class [com.sprint.naukri.EmployerControllerMethodTests]: class path resource [com/sprint/naukri/EmployerControllerMethodTestsContext.groovy] does not exist
+13:52:37.948 [Test worker] INFO org.springframework.test.context.support.AbstractContextLoader - Could not detect default resource locations for test class [com.sprint.naukri.EmployerControllerMethodTests]: no resource found for suffixes {-context.xml, Context.groovy}.
+13:52:37.950 [Test worker] INFO org.springframework.test.context.support.AnnotationConfigContextLoaderUtils - Could not detect default configuration classes for test class [com.sprint.naukri.EmployerControllerMethodTests]: EmployerControllerMethodTests does not declare any static, non-private, non-final, nested classes annotated with @Configuration.
+13:52:38.034 [Test worker] DEBUG org.springframework.test.context.support.ActiveProfilesUtils - Could not find an 'annotation declaring class' for annotation type [org.springframework.test.context.ActiveProfiles] and class [com.sprint.naukri.EmployerControllerMethodTests]
+13:52:38.190 [Test worker] DEBUG org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider - Identified candidate component class: file [D:\Java practice\SpringBoot\final\naukri\build\classes\java\main\com\sprint\naukri\NaukriApplication.class]
+13:52:38.192 [Test worker] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper - Found @SpringBootConfiguration com.sprint.naukri.NaukriApplication for test class com.sprint.naukri.EmployerControllerMethodTests
+13:52:38.380 [Test worker] DEBUG org.springframework.boot.test.context.SpringBootTestContextBootstrapper - @TestExecutionListeners is not present for class [com.sprint.naukri.EmployerControllerMethodTests]: using defaults.
+13:52:38.381 [Test worker] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper - Loaded default TestExecutionListener class names from location [META-INF/spring.factories]: [org.springframework.security.test.context.support.WithSecurityContextTestExecutionListener, org.springframework.security.test.context.support.ReactorContextTestExecutionListener, org.springframework.boot.test.autoconfigure.restdocs.RestDocsTestExecutionListener, org.springframework.boot.test.autoconfigure.web.client.MockRestServiceServerResetTestExecutionListener, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcPrintOnlyOnFailureTestExecutionListener, org.springframework.boot.test.autoconfigure.web.servlet.WebDriverTestExecutionListener, org.springframework.boot.test.autoconfigure.webservices.client.MockWebServiceServerTestExecutionListener, org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener, org.springframework.boot.test.mock.mockito.ResetMocksTestExecutionListener, org.springframework.test.context.web.ServletTestExecutionListener, org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener, org.springframework.test.context.event.ApplicationEventsTestExecutionListener, org.springframework.test.context.support.DependencyInjectionTestExecutionListener, org.springframework.test.context.support.DirtiesContextTestExecutionListener, org.springframework.test.context.transaction.TransactionalTestExecutionListener, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener, org.springframework.test.context.event.EventPublishingTestExecutionListener]
+13:52:38.412 [Test worker] INFO org.springframework.boot.test.context.SpringBootTestContextBootstrapper - Using TestExecutionListeners: [org.springframework.test.context.web.ServletTestExecutionListener@1c61eda5, org.springframework.test.context.support.DirtiesContextBeforeModesTestExecutionListener@1859ffda, org.springframework.test.context.event.ApplicationEventsTestExecutionListener@59838256, org.springframework.boot.test.mock.mockito.MockitoTestExecutionListener@131a7516, org.springframework.boot.test.autoconfigure.SpringBootDependencyInjectionTestExecutionListener@5ae15, org.springframework.test.context.support.DirtiesContextTestExecutionListener@577536e0, org.springframework.test.context.transaction.TransactionalTestExecutionListener@12219f6a, org.springframework.test.context.jdbc.SqlScriptsTestExecutionListener@52d3fafd, org.springframework.security.test.context.support.WithSecurityContextTestExecutionListener@7f0b93b4, org.springframework.test.context.event.EventPublishingTestExecutionListener@1376883, org.springframework.security.test.context.support.ReactorContextTestExecutionListener@1f736d00, org.springframework.boot.test.autoconfigure.restdocs.RestDocsTestExecutionListener@523a7801, org.springframework.boot.test.autoconfigure.web.client.MockRestServiceServerResetTestExecutionListener@718fd7c1, org.springframework.boot.test.autoconfigure.web.servlet.MockMvcPrintOnlyOnFailureTestExecutionListener@4bc6da03, org.springframework.boot.test.autoconfigure.web.servlet.WebDriverTestExecutionListener@4f59a516, org.springframework.boot.test.autoconfigure.webservices.client.MockWebServiceServerTestExecutionListener@4e22368c, org.springframework.boot.test.mock.mockito.ResetMocksTestExecutionListener@411cd156]
+13:52:38.416 [Test worker] DEBUG org.springframework.test.context.support.AbstractDirtiesContextTestExecutionListener - Before test class: context [DefaultTestContext@5c6a5192 testClass = EmployerControllerMethodTests, testInstance = [null], testMethod = [null], testException = [null], mergedContextConfiguration = [WebMergedContextConfiguration@1c8f6c66 testClass = EmployerControllerMethodTests, locations = '{}', classes = '{class com.sprint.naukri.NaukriApplication}', contextInitializerClasses = '[]', activeProfiles = '{}', propertySourceLocations = '{}', propertySourceProperties = '{org.springframework.boot.test.context.SpringBootTestContextBootstrapper=true}', contextCustomizers = set[org.springframework.boot.test.autoconfigure.actuate.metrics.MetricsExportContextCustomizerFactory$DisableMetricExportContextCustomizer@443effcb, org.springframework.boot.test.autoconfigure.properties.PropertyMappingContextCustomizer@0, org.springframework.boot.test.autoconfigure.web.servlet.WebDriverContextCustomizerFactory$Customizer@2f897dab, org.springframework.boot.test.context.filter.ExcludeFilterContextCustomizer@45acdd11, org.springframework.boot.test.json.DuplicateJsonObjectContextCustomizerFactory$DuplicateJsonObjectContextCustomizer@7b948f3e, org.springframework.boot.test.mock.mockito.MockitoContextCustomizer@0, org.springframework.boot.test.web.client.TestRestTemplateContextCustomizer@53cf9c99, org.springframework.boot.test.context.SpringBootTestArgs@1, org.springframework.boot.test.context.SpringBootTestWebEnvironment@11a82d0f], resourceBasePath = 'src/main/webapp', contextLoader = 'org.springframework.boot.test.context.SpringBootContextLoader', parent = [null]], attributes = map['org.springframework.test.context.web.ServletTestExecutionListener.activateListener' -&gt; true]], class annotated with @DirtiesContext [false] with mode [null].
+
+  .   ____          _            __ _ _
+ /\\ / ___'_ __ _ _(_)_ __  __ _ \ \ \ \
+( ( )\___ | '_ | '_| | '_ \/ _` | \ \ \ \
+ \\/  ___)| |_)| | | | | || (_| |  ) ) ) )
+  '  |____| .__|_| |_|_| |_\__, | / / / /
+ =========|_|==============|___/=/_/_/_/
+ :: Spring Boot ::               (v2.6.12)
+
+2022-11-10 13:52:38.918  INFO 10248 --- [    Test worker] c.s.n.EmployerControllerMethodTests      : Starting EmployerControllerMethodTests using Java 17.0.4.1 on Yash with PID 10248 (started by yashs in D:\Java practice\SpringBoot\final\naukri)
+2022-11-10 13:52:38.920  INFO 10248 --- [    Test worker] c.s.n.EmployerControllerMethodTests      : No active profile set, falling back to 1 default profile: &quot;default&quot;
+2022-11-10 13:52:39.858  INFO 10248 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Bootstrapping Spring Data JPA repositories in DEFAULT mode.
+2022-11-10 13:52:39.947  INFO 10248 --- [    Test worker] .s.d.r.c.RepositoryConfigurationDelegate : Finished Spring Data repository scanning in 75 ms. Found 6 JPA repository interfaces.
+2022-11-10 13:52:41.369  INFO 10248 --- [    Test worker] o.hibernate.jpa.internal.util.LogHelper  : HHH000204: Processing PersistenceUnitInfo [name: default]
+2022-11-10 13:52:41.447  INFO 10248 --- [    Test worker] org.hibernate.Version                    : HHH000412: Hibernate ORM core version 5.6.11.Final
+2022-11-10 13:52:41.719  INFO 10248 --- [    Test worker] o.hibernate.annotations.common.Version   : HCANN000001: Hibernate Commons Annotations {5.1.2.Final}
+2022-11-10 13:52:41.887  INFO 10248 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Starting...
+2022-11-10 13:52:42.175  INFO 10248 --- [    Test worker] com.zaxxer.hikari.HikariDataSource       : HikariPool-1 - Start completed.
+2022-11-10 13:52:42.211  INFO 10248 --- [    Test worker] org.hibernate.dialect.Dialect            : HHH000400: Using dialect: org.hibernate.dialect.PostgreSQLDialect
+2022-11-10 13:52:43.735  INFO 10248 --- [    Test worker] o.h.e.t.j.p.i.JtaPlatformInitiator       : HHH000490: Using JtaPlatform implementation: [org.hibernate.engine.transaction.jta.platform.internal.NoJtaPlatform]
+2022-11-10 13:52:43.751  INFO 10248 --- [    Test worker] j.LocalContainerEntityManagerFactoryBean : Initialized JPA EntityManagerFactory for persistence unit 'default'
+2022-11-10 13:52:44.640  WARN 10248 --- [    Test worker] JpaBaseConfiguration$JpaWebConfiguration : spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+2022-11-10 13:52:46.701  INFO 10248 --- [    Test worker] o.s.s.web.DefaultSecurityFilterChain     : Will secure any request with [org.springframework.security.web.context.request.async.WebAsyncManagerIntegrationFilter@4ecdd8e6, org.springframework.security.web.context.SecurityContextPersistenceFilter@f029f0a, org.springframework.security.web.header.HeaderWriterFilter@7185afb1, org.springframework.security.web.authentication.logout.LogoutFilter@450f1492, com.helper.JwtFilter@59114cd5, org.springframework.security.web.savedrequest.RequestCacheAwareFilter@7f98aaa8, org.springframework.security.web.servletapi.SecurityContextHolderAwareRequestFilter@6aeec23f, org.springframework.security.web.authentication.AnonymousAuthenticationFilter@13bd7c56, org.springframework.security.web.session.SessionManagementFilter@5e44b33, org.springframework.security.web.access.ExceptionTranslationFilter@60433b90, org.springframework.security.web.access.intercept.FilterSecurityInterceptor@691d85be]
+2022-11-10 13:52:51.140  INFO 10248 --- [    Test worker] c.s.n.EmployerControllerMethodTests      : Started EmployerControllerMethodTests in 12.658 seconds (JVM running for 15.002)
+</pre>
+</span>
+</div>
+</div>
+<div id="footer">
+<p>
+<div>
+<label class="hidden" id="label-for-line-wrapping-toggle" for="line-wrapping-toggle">Wrap lines
+<input id="line-wrapping-toggle" type="checkbox" autocomplete="off"/>
+</label>
+</div>Generated by 
+<a href="http://www.gradle.org">Gradle 7.5.1</a> at 10-Nov-2022, 1:54:30 pm</p>
+</div>
+</div>
+</body>
+</html>

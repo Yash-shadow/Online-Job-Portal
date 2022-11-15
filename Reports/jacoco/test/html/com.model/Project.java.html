@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>Project.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">naukri</a> &gt; <a href="index.source.html" class="el_package">com.model</a> &gt; <span class="el_source">Project.java</span></div><h1>Project.java</h1><pre class="source lang-java linenums">package com.model;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonIgnoreType;
+
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+
+@Entity
+@Getter
+<span class="fc" id="L23">@Setter</span>
+@Table(name=&quot;Project_table&quot;)
+<span class="fc" id="L25">@NoArgsConstructor</span>
+
+public class Project {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+<span class="fc" id="L30">	private int projectId;</span>
+<span class="nc" id="L31">	private String projectName;</span>
+<span class="nc" id="L32">	private String projectDescription;</span>
+	
+	@ManyToOne(fetch = FetchType.LAZY
+           )
+  @JsonIgnore
+<span class="nc" id="L37">	private Candidate candidate;</span>
+
+	
+	
+	
+	@Override
+	public String toString() {
+<span class="nc" id="L44">		StringBuilder builder = new StringBuilder();</span>
+<span class="nc" id="L45">		builder.append(&quot;Project [projectName=&quot;).append(projectName).append(&quot;, projectDescription=&quot;)</span>
+<span class="nc" id="L46">				.append(projectDescription).append(&quot;, candidate=&quot;).append(candidate).append(&quot;]&quot;);</span>
+<span class="nc" id="L47">		return builder.toString();</span>
+	}
+
+
+
+
+	public Project(String projectName, String projectDescription) {
+<span class="fc" id="L54">		super();</span>
+<span class="fc" id="L55">		this.projectName = projectName;</span>
+<span class="fc" id="L56">		this.projectDescription = projectDescription;</span>
+<span class="fc" id="L57">	}</span>
+	
+	
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

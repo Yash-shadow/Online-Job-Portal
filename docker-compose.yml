@@ -1,0 +1,21 @@
+version: '2'
+services:
+        app:
+                image: 'docker-spring-boot-postgres:latest'
+                build:
+                        context: .
+                container_name: app
+                ports:
+                        - 9900:9989
+                environment:
+                        - SPRING_DATASOURCE_URL=jdbc:postgresql://db/compose-postgres
+                        - SPRING_DATASOURCE_USERNAME=compose-postgres
+                        - SPRING_DATASOURCE_PASSWORD=compose-postgres
+                        - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+        db:
+                image: 'postgres:13.1-alpine'
+                container_name: db
+                environment:
+                        - POSTGRES_USER=compose-postgres
+                        - POSTGRES_PASSWORD=compose-postgres
+                

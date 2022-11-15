@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>AuthenticationController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">naukri</a> &gt; <a href="index.source.html" class="el_package">com.controller</a> &gt; <span class="el_source">AuthenticationController.java</span></div><h1>AuthenticationController.java</h1><pre class="source lang-java linenums">package com.controller;
+
+import javax.servlet.http.HttpServletRequest;
+
+
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.dao.CandidateDAO;
+import com.dao.EmployerDAO;
+import com.dto.EmployerDTO;
+import com.dto.LoginProfile;
+import com.helper.JwtUtil;
+import com.model.Candidate;
+import com.model.Employer;
+import com.model.JwtRequest;
+import com.model.JwtResponse;
+import com.service.CandidateJwtService;
+import com.service.CandidateService;
+
+import io.swagger.annotations.ApiOperation;
+
+
+@RestController
+<span class="fc" id="L36">public class AuthenticationController {</span>
+
+	@Autowired
+	CandidateDAO candDao;
+	@Autowired
+	CandidateService service;
+	@Autowired
+	EmployerDAO employerDao;
+	
+	@Autowired
+	private JwtUtil jwtUtility; 
+	
+	@Autowired
+	private AuthenticationManager authenticationManager;
+	
+	@Autowired
+	private CandidateJwtService candidateService;
+	
+	@PostMapping(&quot;/&quot;)
+	public String login() {
+<span class="nc" id="L56">		return &quot;Successfully Landed to the Page&quot;;</span>
+	}
+	
+	@RequestMapping(value = &quot;/authenticate&quot;, headers = &quot;Accept=application/json&quot;, method = RequestMethod.POST)
+	public JwtResponse authenticateCand(@RequestBody JwtRequest jwtRequest) throws UsernameNotFoundException, Exception {
+		
+//		System.out.println(jwtRequest);
+		
+		try {
+<span class="fc" id="L65">			authenticationManager.authenticate(</span>
+					new UsernamePasswordAuthenticationToken(
+<span class="fc" id="L67">							jwtRequest.getUsername(), </span>
+<span class="fc" id="L68">							jwtRequest.getPassword()</span>
+							)
+					);
+		}
+<span class="fc" id="L72">		catch (BadCredentialsException e) {</span>
+			// TODO: handle exception
+//			System.out.println(e.getMessage());
+<span class="fc" id="L75">			throw new BadCredentialsException(&quot;INVALID_CREDENTIALS&quot;);</span>
+<span class="fc" id="L76">		}</span>
+//		catch(Exception e) {
+//			throw new Exception(e.getMessage());
+//		}
+		
+<span class="fc" id="L81">		final UserDetails userDetails = candidateService.loadUserByUsername(jwtRequest.getUsername());</span>
+		
+<span class="fc" id="L83">		final String token = jwtUtility.generateToken(userDetails);</span>
+		
+<span class="fc" id="L85">		return new JwtResponse(token);</span>
+		
+	}
+	//user Story 1 -able to register and login into to the site 
+	@ApiOperation(value = &quot;Register&quot;,notes=&quot;Register using full User Details&quot;,nickname = &quot;Register Profile&quot; )
+	@PostMapping(&quot;/registerCandidate&quot;)
+	public ResponseEntity&lt;String&gt; registerCandidate(@RequestBody Candidate candidate) {
+		
+<span class="fc" id="L93">	    candDao.save(candidate);</span>
+<span class="fc" id="L94">		return new ResponseEntity&lt;&gt;(&quot;Added Successfully&quot;, HttpStatus.OK);</span>
+		
+	}
+//	@ApiOperation(value = &quot;Register Candidate&quot;,notes=&quot;Register using necessary User Details&quot;,nickname = &quot;Register Profile&quot; )
+//	@PostMapping(&quot;/registerUserProfile&quot;)
+//	public ResponseEntity&lt;String&gt; registerCandidate(@RequestBody LoginProfile profile) {
+//		Candidate c = new Candidate();
+//		c.setAge(profile.getAge());
+//		c.setCandidateName(profile.getCandidateName());
+//		c.setEmailId(profile.getEmailId());
+//		c.setPassword(profile.getPassword());
+//	    candDao.save(c);
+//		return new ResponseEntity&lt;&gt;(&quot;Added Successfully&quot;, HttpStatus.OK);
+//		
+//	}
+//	
+//	@ApiOperation(value = &quot;Register Employee&quot;,notes=&quot;Register using necessary User Details&quot;,nickname = &quot;Register Profile&quot; )
+//	@PostMapping(&quot;/registerEmployer&quot;)
+//	public ResponseEntity&lt;String&gt; registerEmployer(@RequestBody  EmployerDTO employer) {
+//		Employer e = new Employer();
+//		
+//		e.setEmployerName(employer.getEmployerName());
+//		e.setEmailId(employer.getPassword());
+//		e.setPassword(employer.getPassword());
+//	    e.setLocation(employer.getLocation());
+//		employerDao.save(e);
+//		return new ResponseEntity&lt;&gt;(&quot;Added Successfully&quot;, HttpStatus.OK);
+//		
+//	}
+	
+	
+	
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>

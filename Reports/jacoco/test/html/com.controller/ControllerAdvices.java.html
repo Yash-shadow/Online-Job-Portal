@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>ControllerAdvices.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">naukri</a> &gt; <a href="index.source.html" class="el_package">com.controller</a> &gt; <span class="el_source">ControllerAdvices.java</span></div><h1>ControllerAdvices.java</h1><pre class="source lang-java linenums">package com.controller;
+
+
+import org.springframework.http.HttpStatus;
+
+
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.web.bind.annotation.ControllerAdvice;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.context.request.WebRequest;
+import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
+
+import com.exception.CandidateNotFoundException;
+import com.exception.CandidateValidationExceptioncheck;
+import com.exception.FormatException;
+import com.exception.ProjectNotFoundException;
+import com.exception.feedbackException;
+import com.exception.skillNotFoundException;
+import com.model.ExceptionResponse;
+import com.exception.NoSuchJobFoundException;
+import com.exception.NotShortlistedException;
+import com.exception.NullValueException;
+
+
+
+@ControllerAdvice
+<span class="fc" id="L29">public class ControllerAdvices extends ResponseEntityExceptionHandler {</span>
+    
+
+    @ExceptionHandler({CandidateNotFoundException.class})
+    public ResponseEntity&lt;Object&gt; handleItemNotFoundException(CandidateNotFoundException c,WebRequest req)
+    {
+        
+<span class="nc" id="L36">        return  new ResponseEntity&lt;&gt;(c.toString(),HttpStatus.NOT_FOUND);</span>
+    }
+
+    @ExceptionHandler(CandidateValidationExceptioncheck.class)
+    public ResponseEntity&lt;Object&gt; handleValdationException(CandidateValidationExceptioncheck v,WebRequest req){
+        
+<span class="nc" id="L42">         return  new ResponseEntity&lt;&gt;(v.toString(),HttpStatus.FORBIDDEN);</span>
+    }
+
+    @ExceptionHandler(FormatException.class)
+    public ResponseEntity&lt;Object&gt; handleFormatException(FormatException v,WebRequest req){
+        
+<span class="nc" id="L48">         return  new ResponseEntity&lt;&gt;(v.toString(),HttpStatus.FORBIDDEN);</span>
+    }
+   
+    @ExceptionHandler(ProjectNotFoundException.class)
+    public ResponseEntity&lt;Object&gt; handleProjectNotFoundException(ProjectNotFoundException v,WebRequest req){
+        
+<span class="nc" id="L54">        return  new ResponseEntity&lt;&gt;(v.toString(),HttpStatus.FORBIDDEN);</span>
+   }
+    @ExceptionHandler(skillNotFoundException.class)
+    public ResponseEntity&lt;Object&gt; handleSkillNotFoundException(skillNotFoundException v,WebRequest req){
+        
+<span class="nc" id="L59">        return  new ResponseEntity&lt;&gt;(v.toString(),HttpStatus.FORBIDDEN);</span>
+   }
+    @ExceptionHandler(feedbackException.class)
+    public ResponseEntity&lt;Object&gt; handlefeedbackException(feedbackException v,WebRequest req){
+        
+<span class="nc" id="L64">        return  new ResponseEntity&lt;&gt;(v.toString(),HttpStatus.FORBIDDEN);</span>
+   }
+    
+    @ExceptionHandler(BadCredentialsException.class)
+    public ResponseEntity&lt;ExceptionResponse&gt; handleCandidateAuthenticationException(BadCredentialsException v,WebRequest req){
+        
+<span class="nc" id="L70">    	ExceptionResponse excpResp = new ExceptionResponse(false, v.getMessage(), String.valueOf(HttpStatus.NOT_FOUND));</span>
+    	
+<span class="nc" id="L72">        return  new ResponseEntity&lt;&gt;(excpResp,HttpStatus.NOT_FOUND);</span>
+   }
+    
+    @ExceptionHandler(NoSuchJobFoundException.class)
+    public ResponseEntity&lt;Object&gt; handleNoSuchJobFoundException(NoSuchJobFoundException e, WebRequest req){
+<span class="nc" id="L77">    	return new ResponseEntity&lt;&gt;(e.toString(), HttpStatus.NOT_FOUND);</span>
+    }
+    
+    @ExceptionHandler(NotShortlistedException.class)
+    public ResponseEntity&lt;Object&gt; handleNotShortlistedException(NotShortlistedException e, WebRequest req){
+<span class="nc" id="L82">    	return new ResponseEntity&lt;&gt;(e.toString(), HttpStatus.NOT_ACCEPTABLE);</span>
+    }
+    
+    @ExceptionHandler(NullValueException.class)
+    public ResponseEntity&lt;Object&gt; handleNullValueException(NullValueException e, WebRequest req){
+<span class="nc" id="L87">    	return new ResponseEntity&lt;&gt;(e.toString(), HttpStatus.NOT_ACCEPTABLE);</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.7.202105040129</span></div></body></html>
