@@ -17,3 +17,8 @@ services:
                         - POSTGRES_USER=compose-postgres
                         - POSTGRES_PASSWORD=compose-postgres
                 
+                volumes:
+                        - user_data:/var/lib/postgresql
+volumes:
+        user_data:
+                driver: local
