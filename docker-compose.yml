@@ -1,9 +1,7 @@
 version: '2'
 services:
         app:
-                image: 'docker-spring-boot-postgres:latest'
-                build:
-                        context: .
+                image: yash1600/project:1.0
                 container_name: app
                 ports:
                         - 9900:9989
