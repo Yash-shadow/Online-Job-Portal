@@ -1,0 +1,44 @@
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-app-deploy
+spec:
+  replicas: 3
+  selector:
+    matchLabels:
+      app: spring-app-red
+  template:
+    metadata:
+      labels:
+        app: spring-app-red
+    spec:
+      containers:
+        - name: spring-app
+          image: ompatre/sprint2:v1
+          ports:
+            - containerPort: 9989
+          env:
+            - name: SPRING_DATASOURCE_URL
+              value: jdbc:postgresql://db-postgres:5432/compose-postgres
+            - name: SPRING_DATASOURCE_USERNAME
+              value: compose-postgres
+            - name: SPRING_DATASOURCE_PASSWORD
+              value: compose-postgres
+            - name: SPRING_JPA_HIBERNATE_DDL_AUTO
+              value: update
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: svc-app
+spec:
+  selector:
+    app: spring-app-red
+  ports:
+    - port: 80
+      targetPort: 9989
+  type: LoadBalancer
+
+
+
