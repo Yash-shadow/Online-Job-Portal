@@ -24,7 +24,7 @@ spec:
             - name: SPRING_DATASOURCE_USERNAME
               value: compose-postgres
             - name: SPRING_DATASOURCE_PASSWORD
-              value: compose-postgres
+              value: xxxxx
             - name: SPRING_JPA_HIBERNATE_DDL_AUTO
               value: update
 ---
